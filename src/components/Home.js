@@ -9,6 +9,7 @@ function Home() {
     useEffect(() => {
         console.log('use effect');
         async function fetchData() {
+            // TODO: sacar URL hardcodeada.
             const response = await axios.get('http://192.168.68.106:3000/cars/');
             setCars(response.data);
         }
