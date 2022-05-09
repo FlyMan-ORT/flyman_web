@@ -1,7 +1,10 @@
+import Home from './components/Home';
 
 function App() {
   return (
-    <h2>FlyMan</h2>
+    <div>
+      <Home/>      
+    </div>
   );
 }
 
