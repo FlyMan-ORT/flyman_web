@@ -1,10 +1,11 @@
-import Home from './components/Home';
+import React from 'react';
+import NavBar from './components/NavBar';
 
 function App() {
-  return (
-    <div>
-      <Home/>      
-    </div>
+  return (    
+      <div style={{ display: 'flex', flexDirection: 'row' }}>      
+        <NavBar/> 
+      </div>    
   );
 }
 

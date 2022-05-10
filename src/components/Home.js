@@ -42,14 +42,6 @@ function Home() {
         setCarsWithReservationFirst(filteredCars);
     },[cars])
 
-        
-
-
-
-
-    
-
-
     return (
         <div>
             <Table hover>
