@@ -16,33 +16,36 @@ function Home() {
             setCars(carsResponse.data);
 
             const reservantionResponse = await axios.get('http://192.168.0.140:3000/reservations/');
-            setReservations(reservantionResponse.data)
-
-            //separo los autos con reserva
-            let filteredCars= cars.filter((c)=>{
-                return reservations.some((r)=>{
-                    return r.car.plate == c.plate;
-                });
-            });
-            
-            //separo el resto de los autos sacando los que tenian reserva
-            let restOfcars = cars.filter((c)=>{
-                return !filteredCars.includes(c)
-            })    
-                 
-            //junto los dos array quedando los que tienen reserva al principio y agregando los otros detrás
-            //TODO: ordenar previamente los reservados por fecha más próxima
-            filteredCars.push(...restOfcars)
-            
-            setCarsWithReservationFirst(filteredCars);
-    
+            setReservations(reservantionResponse.data)   
             
         }
         fetchData();
-
-
-
     }, [])
+
+    useEffect(()=>{
+        //separo los autos con reserva
+        let filteredCars= cars.filter((c)=>{
+            return reservations.some((r)=>{
+                return r.car.plate == c.plate;
+            });
+        });
+        
+        //separo el resto de los autos sacando los que tenian reserva
+        let restOfcars = cars.filter((c)=>{
+            return !filteredCars.includes(c)
+        })    
+                
+        //junto los dos array quedando los que tienen reserva al principio y agregando los otros detrás
+        //TODO: ordenar previamente los reservados por fecha más próxima
+        filteredCars.push(...restOfcars)
+        
+        setCarsWithReservationFirst(filteredCars);
+    },[cars])
+
+        
+
+
+
 
     
 
