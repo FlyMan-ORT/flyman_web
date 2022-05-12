@@ -2,6 +2,22 @@ import { Table } from 'reactstrap';
 import Row from './Row';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { DataGrid} from '@mui/x-data-grid';
+
+const columns = [
+    { field: 'id', headerName: 'ID', width: 70, hide: true },
+    { field: 'plate', headerName: 'Patente', width: 130, resizable:true,
+        sortable:false,
+        width: 160,
+        valueGetter: (params) =>`${params.row.plate}`,
+    },
+    { field: 'description', headerName: 'Modelo', width: 130 },
+    { field: 'fuelLevel', headerName: 'Combustible', width: 130 },
+    { field: 'fuelType', headerName: 'Tipo de combustible', width: 130 },
+    { field: 'parkingName', headerName: 'Estacionamiento', width: 130 },
+    { field: 'idParkingSlot', headerName: 'Ubicacion', width: 130 },
+    ]
+  
 
 function Home() {
     const [cars, setCars] = useState([]);
@@ -38,45 +54,34 @@ function Home() {
         //junto los dos array quedando los que tienen reserva al principio y agregando los otros detrás
         //TODO: ordenar previamente los reservados por fecha más próxima
         filteredCars.push(...restOfcars)
+
+        //lo mapeo para la tabla
+        const carsForTable = filteredCars.map((car)=>{
+            return {
+              id:car._id,
+              plate: car.plate,
+              description: car.description,
+              fuelLevel: car.fuelLevel,
+              fuelType: car.fuelType,
+              parkingName: car.parkingName,
+              idParkingSlot: car.idParkingSlot,
+              lastModifiedDate: car.lastModifiedDate
+            }
+          }) 
         
-        setCarsWithReservationFirst(filteredCars);
+        setCarsWithReservationFirst(carsForTable);
     },[cars])
 
     return (
-        <div>
-            <Table hover>
-                <thead>
-                    <tr>
-                        <th>
-                            Patente
-                        </th>
-                        <th>
-                            Modelo
-                        </th>
-                        <th>
-                            Nivel de combustible
-                        </th>
-                        <th>
-                            Tipo de combustible
-                        </th>
-                        <th>
-                            Parking
-                        </th>
-                        <th>
-                            Ubicación
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {
-                        carsWithReservationFirst.map((car) => {
-                            return <Row auto={car} key={car.id} />
-                        })
-                    }
-                </tbody>
-            </Table>
-        </div>
-
+        <div style={{ height: 800, width: '100%' }}>
+        <DataGrid
+          rows={carsWithReservationFirst}
+          columns={columns}
+          pageSize={10}
+          rowsPerPageOptions={[5]}
+          checkboxSelection
+        />
+      </div> 
     );
 }
 
