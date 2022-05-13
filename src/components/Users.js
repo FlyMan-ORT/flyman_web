@@ -5,13 +5,19 @@ import { DataGrid, GridActionsCellItem} from '@mui/x-data-grid';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
+const datagridStyle = {  
+
+
+  
+};
 
 const columns = [
   { field: 'id', headerName: 'ID', width: 70, hide: true },
-  { field: 'name', headerName: 'Nombre', width: 130 },
-  { field: 'email', headerName: 'Email', width: 200,
+  { field: 'name', headerName: 'Nombre', width: 300 },
+  { field: 'phone', headerName: 'Telefono', width: 300 },
+  { field: 'email', headerName: 'Email',
     sortable: false,
-    width: 160,
+    width: 300,
     valueGetter: (params) =>
     `${params.row.email}`,
 },
@@ -19,6 +25,7 @@ const columns = [
   headerName: 'Gestion',
   field: 'actions',
   type: 'actions',
+  width:'400',
   getActions: (params) => [
     <GridActionsCellItem icon={<DeleteIcon/>} onClick={()=>alert('Usuario borrado')} label="Delete" />,
     <GridActionsCellItem icon={<EditIcon/>} onClick={()=>alert('Usuario editado')} label="Print"/>,
@@ -40,7 +47,8 @@ function Users() {
         return {
           id:user._id,
           name:user.name,
-          email:user.email
+          email:user.email,
+          phone: 'linea50-mockUp-mainContainer.js'
         }
       })      
       
@@ -50,7 +58,7 @@ function Users() {
 }, [])
     return (    
       <div style={{ height: 800, width: '100%', display: 'flex', flexDirection: 'column'}}>
-      <DataGrid
+      <DataGrid     
         rows={users}
         columns={columns}
         pageSize={5}

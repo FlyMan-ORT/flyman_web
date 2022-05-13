@@ -13,15 +13,14 @@ const columns = [
         ]
     },
     { field: 'id', headerName: 'ID', width: 70, hide: true },
-    { field: 'plate', headerName: 'Patente', width: 130, resizable:true,
-        sortable:false,
-        width: 160,
+    { field: 'plate', headerName: 'Patente', width: 120, resizable:true,
+        sortable:false,        
         valueGetter: (params) =>`${params.row.plate}`,
     },
-    { field: 'description', headerName: 'Modelo', width: 130 },
+    { field: 'description', headerName: 'Modelo', width: 300 },
     { field: 'fuelLevel', headerName: 'Combustible', width: 130 },
     { field: 'fuelType', headerName: 'Tipo de combustible', width: 130 },
-    { field: 'parkingName', headerName: 'Estacionamiento', width: 130 },
+    { field: 'parkingName', headerName: 'Estacionamiento', width: 300 },
     { field: 'idParkingSlot', headerName: 'Ubicacion', width: 130 },
     ]
   
