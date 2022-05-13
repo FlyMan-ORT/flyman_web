@@ -1,7 +1,10 @@
 import React from 'react';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { DataGrid} from '@mui/x-data-grid';
+import { DataGrid, GridActionsCellItem} from '@mui/x-data-grid';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+
 
 const columns = [
   { field: 'id', headerName: 'ID', width: 70, hide: true },
@@ -11,6 +14,15 @@ const columns = [
     width: 160,
     valueGetter: (params) =>
     `${params.row.email}`,
+},
+{
+  headerName: 'Gestion',
+  field: 'actions',
+  type: 'actions',
+  getActions: (params) => [
+    <GridActionsCellItem icon={<DeleteIcon/>} onClick={()=>alert('Usuario borrado')} label="Delete" />,
+    <GridActionsCellItem icon={<EditIcon/>} onClick={()=>alert('Usuario editado')} label="Print"/>,
+  ]
 },
 
 ];
@@ -37,14 +49,15 @@ function Users() {
   fetchData();
 }, [])
     return (    
-      <div style={{ height: 400, width: '100%' }}>
+      <div style={{ height: 800, width: '100%', display: 'flex', flexDirection: 'column'}}>
       <DataGrid
         rows={users}
         columns={columns}
         pageSize={5}
         rowsPerPageOptions={[5]}
-        checkboxSelection
       />
+
+
     </div>   
     );
   }

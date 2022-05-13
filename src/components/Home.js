@@ -1,10 +1,17 @@
-import { Table } from 'reactstrap';
-import Row from './Row';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { DataGrid} from '@mui/x-data-grid';
+import { DataGrid,GridActionsCellItem} from '@mui/x-data-grid';
+import GroupsIcon from '@mui/icons-material/Groups';
 
 const columns = [
+    {
+        headerName: 'Asignar',
+        field: 'actions',
+        type: 'actions',
+        getActions: (params) => [
+          <GridActionsCellItem icon={<GroupsIcon fontSize='large'/>} onClick={()=>alert(''+params.row.plate+' asignado a Pepelui')} label="Delete" />          
+        ]
+    },
     { field: 'id', headerName: 'ID', width: 70, hide: true },
     { field: 'plate', headerName: 'Patente', width: 130, resizable:true,
         sortable:false,
@@ -79,7 +86,6 @@ function Home() {
           columns={columns}
           pageSize={10}
           rowsPerPageOptions={[5]}
-          checkboxSelection
         />
       </div> 
     );
