@@ -5,16 +5,19 @@ import { DataGrid, GridActionsCellItem} from '@mui/x-data-grid';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
-const datagridStyle = {  
-
-
-  
+const divContainerStyle = { 
+  height: 800, 
+  width: '100%', 
+  display: 'flex', 
+  flexDirection: 'column', 
+  paddingLeft: 20,
+  paddingRight: 50,
 };
 
 const columns = [
   { field: 'id', headerName: 'ID', width: 70, hide: true },
   { field: 'name', headerName: 'Nombre', width: 300 },
-  { field: 'phone', headerName: 'Telefono', width: 300 },
+  { field: 'phone', headerName: 'Telefono', width: 150 },
   { field: 'email', headerName: 'Email',
     sortable: false,
     width: 300,
@@ -48,7 +51,7 @@ function Users() {
           id:user._id,
           name:user.name,
           email:user.email,
-          phone: 'linea50-mockUp-mainContainer.js'
+          phone: user.phone
         }
       })      
       
@@ -57,7 +60,7 @@ function Users() {
   fetchData();
 }, [])
     return (    
-      <div style={{ height: 800, width: '100%', display: 'flex', flexDirection: 'column'}}>
+      <div style={divContainerStyle}>
       <DataGrid     
         rows={users}
         columns={columns}

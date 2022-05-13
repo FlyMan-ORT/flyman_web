@@ -3,6 +3,15 @@ import { useEffect, useState } from 'react';
 import { DataGrid,GridActionsCellItem} from '@mui/x-data-grid';
 import GroupsIcon from '@mui/icons-material/Groups';
 
+const divContainerStyle = { 
+    height: 800, 
+    width: '100%', 
+    display: 'flex', 
+    flexDirection: 'column', 
+    paddingLeft: 20,
+    paddingRight: 50,
+  };
+
 const columns = [
     {
         headerName: 'Asignar',
@@ -79,7 +88,7 @@ function Home() {
     },[cars])
 
     return (
-        <div style={{ height: 800, width: '100%' }}>
+        <div style={divContainerStyle}>
         <DataGrid
           rows={carsWithReservationFirst}
           columns={columns}
