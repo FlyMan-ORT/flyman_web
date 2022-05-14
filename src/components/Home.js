@@ -3,6 +3,15 @@ import { useEffect, useState } from 'react';
 import { DataGrid,GridActionsCellItem} from '@mui/x-data-grid';
 import GroupsIcon from '@mui/icons-material/Groups';
 
+const divContainerStyle = { 
+    height: 800, 
+    width: '100%', 
+    display: 'flex', 
+    flexDirection: 'column', 
+    paddingLeft: 20,
+    paddingRight: 50,
+  };
+
 const columns = [
     {
         headerName: 'Asignar',
@@ -13,15 +22,14 @@ const columns = [
         ]
     },
     { field: 'id', headerName: 'ID', width: 70, hide: true },
-    { field: 'plate', headerName: 'Patente', width: 130, resizable:true,
-        sortable:false,
-        width: 160,
+    { field: 'plate', headerName: 'Patente', width: 120, resizable:true,
+        sortable:false,        
         valueGetter: (params) =>`${params.row.plate}`,
     },
-    { field: 'description', headerName: 'Modelo', width: 130 },
+    { field: 'description', headerName: 'Modelo', width: 300 },
     { field: 'fuelLevel', headerName: 'Combustible', width: 130 },
     { field: 'fuelType', headerName: 'Tipo de combustible', width: 130 },
-    { field: 'parkingName', headerName: 'Estacionamiento', width: 130 },
+    { field: 'parkingName', headerName: 'Estacionamiento', width: 300 },
     { field: 'idParkingSlot', headerName: 'Ubicacion', width: 130 },
     ]
   
@@ -80,7 +88,7 @@ function Home() {
     },[cars])
 
     return (
-        <div style={{ height: 800, width: '100%' }}>
+        <div style={divContainerStyle}>
         <DataGrid
           rows={carsWithReservationFirst}
           columns={columns}

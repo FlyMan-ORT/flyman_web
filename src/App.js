@@ -1,10 +1,13 @@
 import React from 'react';
-import NavBar from './components/NavBar';
+import MainContainer from './components/MainContainer';
+import TopBar from './components/TopBar';
 
 function App() {
   return (    
-      <div style={{ display: 'flex', flexDirection: 'row' }}>      
-        <NavBar/> 
+      <div style={{ display: 'flex', flexDirection: 'column' }}>      
+        <TopBar/>
+        <MainContainer/> 
+        
       </div>    
   );
 }
