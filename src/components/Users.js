@@ -23,11 +23,27 @@ function Users() {
 
   const [editModalShow, setEditModalShow] = useState(false)
   const [deleteModalShow, setDeleteModalShow] = useState(false)
+  const [newUserModalShow, setNewUserModalShow] = useState(false)
   const [users, setUsers] = useState([]);
-  const [userForDeletion, setUserForDeletion] = useState('');  
+  const [userForEditOrDeletion, setUserForEditOrDeletion] = useState('');
+  const [updateFlag, setUpdateFlag] = useState(false);
+  const [newUser, setNewUser] = useState({ name: '', email: '', phone: '', password: '' });
+
+  async function createUser(user) {
+    const createUserResponse = (await axios.post(`http://192.168.0.140:3000/users/register`, user)).data;
+    setUpdateFlag(!updateFlag)
+  }
+
+  async function updateUser(userId) {
+    console.log(newUser)
+    console.log(userForEditOrDeletion)
+    const updateUserResponse = (await axios.patch(`http://192.168.0.140:3000/users/${userId}`,newUser)).data;
+    setUpdateFlag(!updateFlag)
+  }
 
   async function deleteUser(userId) {
     const deleteResponse = (await axios.delete(`http://192.168.0.140:3000/users/${userId}`)).data;
+    setUpdateFlag(!updateFlag)
   }
 
   const columns = [
@@ -37,7 +53,7 @@ function Users() {
     {
       field: 'email', headerName: 'Email',
       sortable: false,
-      width: 300,
+      width: 250,
       valueGetter: (params) =>
         `${params.row.email}`,
     },
@@ -45,16 +61,21 @@ function Users() {
       headerName: 'Gestion',
       field: 'actions',
       type: 'actions',
-      width: '400',
+      width: '90',
 
       getActions: (params) => [
-        <GridActionsCellItem icon={<DeleteIcon />} onClick={() => {                    
-          setUserForDeletion(params.row)          
+        <GridActionsCellItem icon={<DeleteIcon />} onClick={() => {
+          setUserForEditOrDeletion(params.row)
           setDeleteModalShow(true)
         }
         }
           label="Delete" />,
-        <GridActionsCellItem icon={<EditIcon />} onClick={() => { setEditModalShow(true) }} label="Print" />,
+        <GridActionsCellItem icon={<EditIcon />} onClick={() => {
+          setUserForEditOrDeletion(params.row)
+          setEditModalShow(true)
+        }
+        }
+          label="Print" />,
       ]
     },
   ];
@@ -72,15 +93,18 @@ function Users() {
           phone: user.phone
         }
       })
-
       setUsers(usersForTable);
     }
     fetchData();
-  }, [users])
+  }, [updateFlag])
 
   return (
     <div style={divContainerStyle}>
-
+      <ButtonBootstrap variant="light"
+        style={{ alignSelf: 'end', marginBottom: 10, backgroundColor: '#63e1fe' }}
+        onClick={() => setNewUserModalShow(true)}
+      >Nuevo Usuario
+      </ButtonBootstrap>
       <DataGrid
         rows={users}
         columns={columns}
@@ -97,21 +121,29 @@ function Users() {
               <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                 <Form.Label>Nombre y apellido</Form.Label>
                 <Form.Control
-                  type="email"
-                  placeholder="name@example.com"
+                  type="text"
+                  defaultValue={userForEditOrDeletion.name}
+                  onChange={e => setNewUser({ ...newUser, name: e.target.value })}
                   autoFocus
                 />
                 <Form.Label>Email</Form.Label>
                 <Form.Control
-                  type='text'
-                  placeholder="name@example.com"
+                  type="email"   
+                  defaultValue={userForEditOrDeletion.email}               
+                  onChange={e => setNewUser({ ...newUser, email: e.target.value })}
                   autoFocus
                 />
                 <Form.Label>Telefono</Form.Label>
                 <Form.Control
-                  type="phone
-                "
-                  placeholder="name@example.com"
+                  type="phone"
+                  defaultValue={userForEditOrDeletion.phone}
+                  onChange={e => setNewUser({ ...newUser, phone: e.target.value })}
+                  autoFocus
+                />
+                <Form.Label>Password</Form.Label>
+                <Form.Control
+                  type="password"               
+                  onChange={e => setNewUser({ ...newUser, password: e.target.value })}
                   autoFocus
                 />
               </Form.Group>
@@ -121,7 +153,11 @@ function Users() {
             <ButtonBootstrap variant="secondary" onClick={() => { setEditModalShow(false) }}>
               Cerrar
             </ButtonBootstrap>
-            <ButtonBootstrap variant="primary" onClick={() => { setEditModalShow(false) }}>
+            <ButtonBootstrap variant="primary" onClick={() => {
+              updateUser(userForEditOrDeletion.id)
+              setEditModalShow(false)
+            }
+            }>
               Guardar cambios
             </ButtonBootstrap>
           </Modal.Footer>
@@ -131,18 +167,66 @@ function Users() {
           <Modal.Header closeButton>
             <Modal.Title>Eliminar usuario</Modal.Title>
           </Modal.Header>
-          <Modal.Body>Esta a punto de eliminar al usuario {userForDeletion.name}</Modal.Body>
+          <Modal.Body>Esta a punto de eliminar al usuario {userForEditOrDeletion.name}</Modal.Body>
           <Modal.Footer>
             <ButtonBootstrap variant="secondary" onClick={() => setDeleteModalShow(false)}>
               Cancelar
             </ButtonBootstrap>
-            <ButtonBootstrap variant="danger" onClick={() => {              
-              deleteUser(userForDeletion.id)                                
-              setDeleteModalShow(false)              
-              
+            <ButtonBootstrap variant="danger" onClick={() => {
+              deleteUser(userForEditOrDeletion.id)
+              setDeleteModalShow(false)
+
             }
             }>
               Confirmar
+            </ButtonBootstrap>
+          </Modal.Footer>
+        </Modal>
+
+        <Modal show={newUserModalShow}>
+          <Modal.Header >
+            <Modal.Title>Editar datos</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form>
+              <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                <Form.Label>Nombre y apellido</Form.Label>
+                <Form.Control
+                  type="text" 
+                  onChange={e => setNewUser({ ...newUser, name: e.target.value })}                                
+                  autoFocus
+                />
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  type='email'  
+                  onChange={e => setNewUser({ ...newUser, email: e.target.value })}                
+                  autoFocus
+                />
+                <Form.Label>Telefono</Form.Label>
+                <Form.Control
+                  type="phone"  
+                  onChange={e => setNewUser({ ...newUser, phone: e.target.value })}                
+                  autoFocus
+                />
+                <Form.Label>Password</Form.Label>
+                <Form.Control
+                  type="password"                                      
+                  onChange={e => setNewUser({ ...newUser, password: e.target.value })}               
+                  autoFocus
+                />
+              </Form.Group>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <ButtonBootstrap variant="secondary" onClick={() => { setNewUserModalShow(false) }}>
+              Cerrar
+            </ButtonBootstrap>
+            <ButtonBootstrap variant="primary" onClick={() => { 
+              createUser(newUser)
+              setNewUserModalShow(false) 
+              }
+              }>
+              Guardar cambios
             </ButtonBootstrap>
           </Modal.Footer>
         </Modal>
