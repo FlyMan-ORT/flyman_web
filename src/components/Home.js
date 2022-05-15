@@ -22,7 +22,7 @@ const columns = [
         ]
     },
     { field: 'id', headerName: 'ID', width: 70, hide: true },
-    { field: 'plate', headerName: 'Patente', width: 120, resizable:true,
+    { field: 'plate', headerName: 'Patente', width: 120,
         sortable:false,        
         valueGetter: (params) =>`${params.row.plate}`,
     },
