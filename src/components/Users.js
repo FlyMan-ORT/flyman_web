@@ -123,27 +123,27 @@ function Users() {
                 <Form.Control
                   type="text"
                   defaultValue={userForEditOrDeletion.name}
-                  onChange={e => setNewUser({ ...newUser, name: e.target.value })}
+                  onChange={e => setNewUser({ ...userForEditOrDeletion, name: e.target.value })}
                   autoFocus
                 />
                 <Form.Label>Email</Form.Label>
                 <Form.Control
                   type="email"   
                   defaultValue={userForEditOrDeletion.email}               
-                  onChange={e => setNewUser({ ...newUser, email: e.target.value })}
+                  onChange={e => setNewUser({ ...userForEditOrDeletion, email: e.target.value })}
                   autoFocus
                 />
                 <Form.Label>Telefono</Form.Label>
                 <Form.Control
                   type="phone"
                   defaultValue={userForEditOrDeletion.phone}
-                  onChange={e => setNewUser({ ...newUser, phone: e.target.value })}
+                  onChange={e => setNewUser({ ...userForEditOrDeletion, phone: e.target.value })}
                   autoFocus
                 />
                 <Form.Label>Password</Form.Label>
                 <Form.Control
                   type="password"               
-                  onChange={e => setNewUser({ ...newUser, password: e.target.value })}
+                  onChange={e => setNewUser({ ...userForEditOrDeletion, password: e.target.value })}
                   autoFocus
                 />
               </Form.Group>
@@ -185,7 +185,7 @@ function Users() {
 
         <Modal show={newUserModalShow}>
           <Modal.Header >
-            <Modal.Title>Editar datos</Modal.Title>
+            <Modal.Title>Alta de usuario</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form>
@@ -200,19 +200,19 @@ function Users() {
                 <Form.Control
                   type='email'  
                   onChange={e => setNewUser({ ...newUser, email: e.target.value })}                
-                  autoFocus
+                  
                 />
                 <Form.Label>Telefono</Form.Label>
                 <Form.Control
                   type="phone"  
                   onChange={e => setNewUser({ ...newUser, phone: e.target.value })}                
-                  autoFocus
+                  
                 />
                 <Form.Label>Password</Form.Label>
                 <Form.Control
                   type="password"                                      
                   onChange={e => setNewUser({ ...newUser, password: e.target.value })}               
-                  autoFocus
+                  
                 />
               </Form.Group>
             </Form>

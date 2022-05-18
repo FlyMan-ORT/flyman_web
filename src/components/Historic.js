@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
-import ArticleIcon from '@mui/icons-material/Article';
+import LocalCarWashIcon from '@mui/icons-material/LocalCarWash';
 import Modal from 'react-bootstrap/Modal';
 
 
@@ -30,7 +30,7 @@ function Historic() {
       width: '70',
 
       getActions: (params) => [
-        <GridActionsCellItem icon={<ArticleIcon />} onClick={() => {
+        <GridActionsCellItem icon={<LocalCarWashIcon/>} onClick={() => {
           setServicesTasks(params.row.tasks)          
           setDetailsModalShow(true)
         }
