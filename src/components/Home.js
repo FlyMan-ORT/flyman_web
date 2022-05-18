@@ -1,12 +1,13 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 import Modal from 'react-bootstrap/Modal';
 
 const divContainerStyle = {
-  height: 800,
+  height: 800,  
   width: '100%',
   display: 'flex',
   flexDirection: 'column',
@@ -14,17 +15,26 @@ const divContainerStyle = {
   paddingRight: 50,
 };
 
+const mapModalStyle = {
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent:'center'  
+}
 
 function Home() {
   const [cars, setCars] = useState([]);
   const [reservations, setReservations] = useState([]);
   const [carsWithReservationFirst, setCarsWithReservationFirst] = useState([]);
-  const [reservationsModalShow, setReservationsModalShow] = useState(false)
   const [selectedCarReservations, setSelectedCarReservations] = useState([])
-  const handleClose = () => setReservationsModalShow(false);
+  const [reservationsModalShow, setReservationsModalShow] = useState(false)
+  const [mapViewModalShow, setMapViewModalShow] = useState(false)
+  const [carForMapView, setCarForMapView] = useState({position:{latitude:0,longitude:0}})
+  const [sourceForMap, setSourceForMap] = useState('')
 
-  useEffect(() => {
-    console.log('use effect');
+  const handleCloseReservationModal = () => setReservationsModalShow(false);
+  const handleCloseMapViewModal = () => setMapViewModalShow(false);  
+
+  useEffect(() => {    
     async function fetchData() {
       // TODO: sacar URL hardcodeada.
       const carsResponse = await axios.get('http://192.168.0.140:3000/cars/');
@@ -36,6 +46,11 @@ function Home() {
     }
     fetchData();
   }, [])
+
+  useEffect(() => {  
+
+    setSourceForMap('<iframe width = "800" height = "650" style = "border:0" loading = "lazy" allowfullscreen referrerpolicy = "no-referrer-when-downgrade" src = "https://maps.google.com/maps?q='+carForMapView.position.latitude+','+carForMapView.position.longitude+'&hl=es&z=14&amp;output=embed"></iframe >')
+  }, [mapViewModalShow])    
 
   useEffect(() => {
     //separo los autos con reserva
@@ -65,10 +80,10 @@ function Home() {
         parkingName: car.parkingName,
         idParkingSlot: car.idParkingSlot,
         lastModifiedDate: car.lastModifiedDate,
-        reservations: reservations.filter(r => r.car.plate === car.plate)
+        reservations: reservations.filter(r => r.car.plate === car.plate),
+        position: car.position ? {latitude:car.position.latitude, longitude: car.position.longitude} : {latitude:0, longitude: 0}
       }
-    })
-    console.log(carsForTable)
+    })    
     setCarsWithReservationFirst(carsForTable);
   }, [cars])
 
@@ -79,10 +94,9 @@ function Home() {
       type: 'actions',
       getActions: (params) => [
         <GridActionsCellItem icon={<FormatListBulletedIcon fontSize='large' />}
-          onClick={() => {
-            setSelectedCarReservations(params.row.reservations)
+          onClick={() => {            
+            setSelectedCarReservations(params.row.reservations)            
             setReservationsModalShow(true)
-
           }
           }
           label="Delete" />
@@ -90,10 +104,25 @@ function Home() {
     },
     {
       headerName: 'Asignar',
-      field: 'actions',
+      field: 'Asignar',
       type: 'actions',
       getActions: (params) => [
         <GridActionsCellItem icon={<AssignmentIndIcon fontSize='large' />} onClick={() => alert('' + params.row.plate + ' asignado a Pepelui')} label="Delete" />
+      ]
+    },
+    {
+      headerName: 'Ver en mapa', 
+      field: 'map',     
+      type: 'actions',
+      getActions: (params) => [
+        <GridActionsCellItem icon={<LocationOnIcon fontSize='large' />}
+          onClick={async () => { 
+            console.log(params.row) 
+            setCarForMapView(params.row)                    
+            setMapViewModalShow(true)
+          }
+          }
+          label="Delete" />
       ]
     },
     { field: 'id', headerName: 'ID', width: 70, hide: true },
@@ -119,7 +148,7 @@ function Home() {
         pageSize={10}
         rowsPerPageOptions={[5]}
       />
-      <Modal show={reservationsModalShow} onHide={handleClose} size="sm">
+      <Modal show={reservationsModalShow} onHide={handleCloseReservationModal} size="sm">
         <Modal.Header closeButton>
           <Modal.Title>Reservas del dia</Modal.Title>
         </Modal.Header>
@@ -128,8 +157,19 @@ function Home() {
             <div>
               <p>Inicio: {new Date(e.startTime).getHours()}:{new Date(e.startTime).getMinutes()} - Fin {new Date(e.endTime).getHours()}:{new Date(e.endTime).getMinutes()}</p>
             </div>
-        )})}
+          )
+        })}
         </Modal.Body>
+      </Modal>
+
+      <Modal show={mapViewModalShow} onHide={handleCloseMapViewModal} size={'xl'}  >
+        <Modal.Header closeButton>
+          <Modal.Title>Vista de mapa</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={mapModalStyle}>
+          <div dangerouslySetInnerHTML={{ __html: sourceForMap }}></div>
+        </Modal.Body>
+        
       </Modal>
     </div>
   );
