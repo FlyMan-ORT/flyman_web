@@ -5,7 +5,7 @@ import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Modal from 'react-bootstrap/Modal';
-import Button from '@mui/material/Button';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import Form from 'react-bootstrap/Form';
 import ButtonBootstrap from 'react-bootstrap/Button'
 
@@ -21,30 +21,42 @@ const divContainerStyle = {
 
 function Users() {
 
-  const [editModalShow, setEditModalShow] = useState(false)
-  const [deleteModalShow, setDeleteModalShow] = useState(false)
-  const [newUserModalShow, setNewUserModalShow] = useState(false)
+  const [editModalShow, setEditModalShow] = useState(false);
+  const [deleteModalShow, setDeleteModalShow] = useState(false);
+  const [newUserModalShow, setNewUserModalShow] = useState(false);
   const [users, setUsers] = useState([]);
   const [userForEditOrDeletion, setUserForEditOrDeletion] = useState('');
   const [updateFlag, setUpdateFlag] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', phone: '', password: '' });
+  const [assigmentsModalShow, setAssigmentsModalShow] = useState(false);
+  const [reservesByUser, setReservesByUser] = useState();
+
 
   async function createUser(user) {
-    const createUserResponse = (await axios.post(`http://192.168.0.140:3000/users/register`, user)).data;
+    const createUserResponse = (await axios.post(`http://192.168.68.54:3000/users/register`, user)).data;
     setUpdateFlag(!updateFlag)
   }
 
   async function updateUser(userId) {
     console.log(newUser)
     console.log(userForEditOrDeletion)
-    const updateUserResponse = (await axios.patch(`http://192.168.0.140:3000/users/${userId}`,newUser)).data;
+    const updateUserResponse = (await axios.patch(`http://192.168.68.54:3000/users/${userId}`, newUser)).data;
     setUpdateFlag(!updateFlag)
   }
 
   async function deleteUser(userId) {
-    const deleteResponse = (await axios.delete(`http://192.168.0.140:3000/users/${userId}`)).data;
+    const deleteResponse = (await axios.delete(`http://192.168.68.54:3000/users/${userId}`)).data;
     setUpdateFlag(!updateFlag)
   }
+
+  async function reservesByDate(email) {
+    const reserves = (await axios.get(`http://192.168.68.54:3000/reservations/`)).data;
+      //`http://192.168.0.140:3000/reservations/maintenance/date/${new Date()}`)).data;
+    setReservesByUser(reserves.filter((r)=>r.user.email === email));
+   
+  }
+
+
 
   const columns = [
     { field: 'id', headerName: 'ID', width: 70, hide: true },
@@ -58,23 +70,40 @@ function Users() {
         `${params.row.email}`,
     },
     {
+      headerName: 'Asignaciones',
+      field: 'Asignaciones',
+      type: 'actions',
+      width: '120',
+      getActions: (params) => [
+        <GridActionsCellItem icon={<AssignmentIcon fontSize='large' />}
+          onClick={() => {
+            setUserForEditOrDeletion(params.row);
+            reservesByDate("geronimo@mykeego.com")
+            console.log(reservesByUser);
+            setAssigmentsModalShow(true);
+          }} label="Assigment" />
+      ]
+    },
+    {
       headerName: 'Gestion',
       field: 'actions',
       type: 'actions',
       width: '90',
 
       getActions: (params) => [
-        <GridActionsCellItem icon={<DeleteIcon />} onClick={() => {
-          setUserForEditOrDeletion(params.row)
-          setDeleteModalShow(true)
-        }
-        }
+        <GridActionsCellItem icon={<DeleteIcon />}
+          onClick={() => {
+            setUserForEditOrDeletion(params.row)
+            setDeleteModalShow(true)
+          }
+          }
           label="Delete" />,
-        <GridActionsCellItem icon={<EditIcon />} onClick={() => {
-          setUserForEditOrDeletion(params.row)
-          setEditModalShow(true)
-        }
-        }
+        <GridActionsCellItem icon={<EditIcon />}
+          onClick={() => {
+            setUserForEditOrDeletion(params.row)
+            setEditModalShow(true)
+          }
+          }
           label="Print" />,
       ]
     },
@@ -83,7 +112,7 @@ function Users() {
   useEffect(() => {
     async function fetchData() {
       // TODO: sacar URL hardcodeada.
-      const usersResponse = (await axios.get('http://192.168.0.140:3000/users/')).data;
+      const usersResponse = (await axios.get('http://192.168.68.54:3000/users/')).data;
 
       const usersForTable = usersResponse.map((user) => {
         return {
@@ -128,8 +157,8 @@ function Users() {
                 />
                 <Form.Label>Email</Form.Label>
                 <Form.Control
-                  type="email"   
-                  defaultValue={userForEditOrDeletion.email}               
+                  type="email"
+                  defaultValue={userForEditOrDeletion.email}
                   onChange={e => setNewUser({ ...userForEditOrDeletion, email: e.target.value })}
                   autoFocus
                 />
@@ -142,7 +171,7 @@ function Users() {
                 />
                 <Form.Label>Password</Form.Label>
                 <Form.Control
-                  type="password"               
+                  type="password"
                   onChange={e => setNewUser({ ...userForEditOrDeletion, password: e.target.value })}
                   autoFocus
                 />
@@ -192,27 +221,27 @@ function Users() {
               <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                 <Form.Label>Nombre y apellido</Form.Label>
                 <Form.Control
-                  type="text" 
-                  onChange={e => setNewUser({ ...newUser, name: e.target.value })}                                
+                  type="text"
+                  onChange={e => setNewUser({ ...newUser, name: e.target.value })}
                   autoFocus
                 />
                 <Form.Label>Email</Form.Label>
                 <Form.Control
-                  type='email'  
-                  onChange={e => setNewUser({ ...newUser, email: e.target.value })}                
-                  
+                  type='email'
+                  onChange={e => setNewUser({ ...newUser, email: e.target.value })}
+
                 />
                 <Form.Label>Telefono</Form.Label>
                 <Form.Control
-                  type="phone"  
-                  onChange={e => setNewUser({ ...newUser, phone: e.target.value })}                
-                  
+                  type="phone"
+                  onChange={e => setNewUser({ ...newUser, phone: e.target.value })}
+
                 />
                 <Form.Label>Password</Form.Label>
                 <Form.Control
-                  type="password"                                      
-                  onChange={e => setNewUser({ ...newUser, password: e.target.value })}               
-                  
+                  type="password"
+                  onChange={e => setNewUser({ ...newUser, password: e.target.value })}
+
                 />
               </Form.Group>
             </Form>
@@ -221,14 +250,21 @@ function Users() {
             <ButtonBootstrap variant="secondary" onClick={() => { setNewUserModalShow(false) }}>
               Cerrar
             </ButtonBootstrap>
-            <ButtonBootstrap variant="primary" onClick={() => { 
+            <ButtonBootstrap variant="primary" onClick={() => {
               createUser(newUser)
-              setNewUserModalShow(false) 
-              }
-              }>
+              setNewUserModalShow(false)
+            }
+            }>
               Guardar cambios
             </ButtonBootstrap>
           </Modal.Footer>
+        </Modal>
+        <Modal show={assigmentsModalShow} onHide={() => {
+          setAssigmentsModalShow(false)}} size="sm">
+          <Modal.Header closeButton>
+            <Modal.Title>Asignaciones</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>Hola</Modal.Body>
         </Modal>
       </div>
 
