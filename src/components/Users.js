@@ -25,38 +25,30 @@ function Users() {
   const [deleteModalShow, setDeleteModalShow] = useState(false);
   const [newUserModalShow, setNewUserModalShow] = useState(false);
   const [users, setUsers] = useState([]);
+  const [reserves, setReserves] = useState([]);
   const [userForEditOrDeletion, setUserForEditOrDeletion] = useState('');
   const [updateFlag, setUpdateFlag] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', phone: '', password: '' });
   const [assigmentsModalShow, setAssigmentsModalShow] = useState(false);
-  const [reservesByUser, setReservesByUser] = useState();
+  const [reservesByUser, setReservesByUser] = useState([]);
+
+  
 
 
   async function createUser(user) {
-    const createUserResponse = (await axios.post(`http://192.168.68.54:3000/users/register`, user)).data;
+    const createUserResponse = (await axios.post(`http://192.168.0.140:3000/users/register`, user)).data;
     setUpdateFlag(!updateFlag)
   }
 
   async function updateUser(userId) {
-    console.log(newUser)
-    console.log(userForEditOrDeletion)
-    const updateUserResponse = (await axios.patch(`http://192.168.68.54:3000/users/${userId}`, newUser)).data;
+    const updateUserResponse = (await axios.patch(`http://192.168.0.140:3000/users/${userId}`, newUser)).data;
     setUpdateFlag(!updateFlag)
   }
 
   async function deleteUser(userId) {
-    const deleteResponse = (await axios.delete(`http://192.168.68.54:3000/users/${userId}`)).data;
+    const deleteResponse = (await axios.delete(`http://192.168.0.140:3000/users/${userId}`)).data;
     setUpdateFlag(!updateFlag)
   }
-
-  async function reservesByDate(email) {
-    const reserves = (await axios.get(`http://192.168.68.54:3000/reservations/`)).data;
-      //`http://192.168.0.140:3000/reservations/maintenance/date/${new Date()}`)).data;
-    setReservesByUser(reserves.filter((r)=>r.user.email === email));
-   
-  }
-
-
 
   const columns = [
     { field: 'id', headerName: 'ID', width: 70, hide: true },
@@ -76,10 +68,9 @@ function Users() {
       width: '120',
       getActions: (params) => [
         <GridActionsCellItem icon={<AssignmentIcon fontSize='large' />}
-          onClick={() => {
-            setUserForEditOrDeletion(params.row);
-            reservesByDate("geronimo@mykeego.com")
-            console.log(reservesByUser);
+          onClick={() => {            
+            setUserForEditOrDeletion(params.row);            
+            setReservesByUser(reserves.filter((r)=>r.user.email === params.row.email))
             setAssigmentsModalShow(true);
           }} label="Assigment" />
       ]
@@ -112,7 +103,8 @@ function Users() {
   useEffect(() => {
     async function fetchData() {
       // TODO: sacar URL hardcodeada.
-      const usersResponse = (await axios.get('http://192.168.68.54:3000/users/')).data;
+      const usersResponse = (await axios.get('http://192.168.0.140:3000/users/')).data;
+      const reserves = (await axios.get(`http://192.168.0.140:3000/reservations/`)).data;
 
       const usersForTable = usersResponse.map((user) => {
         return {
@@ -123,6 +115,7 @@ function Users() {
         }
       })
       setUsers(usersForTable);
+      setReserves(reserves)
     }
     fetchData();
   }, [updateFlag])
@@ -264,7 +257,7 @@ function Users() {
           <Modal.Header closeButton>
             <Modal.Title>Asignaciones</Modal.Title>
           </Modal.Header>
-          <Modal.Body>Hola</Modal.Body>
+          <Modal.Body>{reservesByUser.map((r)=>{return(<div><p>{r.startTime} : {r.endTime}</p></div>)})}</Modal.Body>
         </Modal>
       </div>
 
