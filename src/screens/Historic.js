@@ -3,13 +3,7 @@ import axios from 'axios';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import LocalCarWashIcon from '@mui/icons-material/LocalCarWash';
 import Modal from 'react-bootstrap/Modal';
-
-// TODO: poner la BASE_URL en un context global.
-const BASE_URL = 'http://192.168.0.4:3000'; // Eze
-// const BASE_URL = 'http://192.168.0.4:3000'; // Fer P
-// const BASE_URL = 'http://192.168.0.4:3000'; // Fer M
-// const BASE_URL = 'http://192.168.0.4:3000'; // Leo
-// const BASE_URL = 'http://192.168.0.4:3000'; // Lucho
+import { BASE_URL } from '../utils/connections';
 
 const divContainerStyle = {
   height: 800,
