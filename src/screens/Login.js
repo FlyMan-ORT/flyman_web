@@ -1,9 +1,12 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import Button from '@mui/material/Button';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
-import GlobalContext from '../components/globals/context';
 import { login } from '../api/users';
+import { postLogin } from '../features/login';
+import { isFailedLogin } from '../selectors/login';
 
 const loginButtonStyle = {
     marginLeft: 'auto',
@@ -19,23 +22,15 @@ const containerDivStyle = {
 
 
 function Login() {
+    const dispatch = useDispatch();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isPasswordVisible, setIsPasswordVisible] = useState(true);
-    
-    const PASSWORD_VISIBLE = 'eye';
-    const PASSWORD_NOT_VISIBLE = 'eye-slash';
-    
-    const { authUser } = useContext(GlobalContext);
-    
+    const failedLogin = useSelector(state => isFailedLogin(state));
+        
     const userLogin = async () => {
         if (!email || !password) return;
-        try {
-            let response = await login(email, password);
-            if (response.token) authUser(response.token);
-        } catch (error) {
-            openAlert();
-        }
+        dispatch(postLogin({email, password}));
     }
     
     const onPress = () => setIsPasswordVisible(prev => !prev);
@@ -60,6 +55,7 @@ function Login() {
                                     type="password"
                                     onChange={e => setPassword(e.target.value)}
                                 />
+                                {failedLogin && (<span style={{color: 'red', fontSize: '14px'}}>La contraseña o el usuario es incorrecto</span>)}
                             </Form.Group>
                         </Form>
                         <Button variant="contained" style={{ width: '100%' }} onClick={() => userLogin()
