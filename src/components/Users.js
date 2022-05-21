@@ -70,7 +70,13 @@ function Users() {
         <GridActionsCellItem icon={<AssignmentIcon fontSize='large' />}
           onClick={() => {            
             setUserForEditOrDeletion(params.row);            
-            setReservesByUser(reserves.filter((r)=>r.user.email === params.row.email))
+            setReservesByUser(reserves.filter((r)=>
+              r.user.email === params.row.email &&
+              r.type === 'M' &&
+              new Date(r.startTime).getDate() === new Date().getDate() &&
+              new Date(r.startTime).getMonth() === new Date().getMonth() &&
+              new Date(r.startTime).getFullYear() === new Date().getFullYear()
+              ))
             setAssigmentsModalShow(true);
           }} label="Assigment" />
       ]
@@ -105,6 +111,11 @@ function Users() {
       // TODO: sacar URL hardcodeada.
       const usersResponse = (await axios.get('http://192.168.0.140:3000/users/')).data;
       const reserves = (await axios.get(`http://192.168.0.140:3000/reservations/`)).data;
+
+      console.log(reserves[0].id)
+      console.log('day',new Date(reserves[0].startTime).getDate())
+      console.log('mes',new Date(reserves[0].startTime).getMonth())
+      console.log('anmio',new Date(reserves[0].startTime).getFullYear())
 
       const usersForTable = usersResponse.map((user) => {
         return {
