@@ -6,6 +6,13 @@ import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import Modal from 'react-bootstrap/Modal';
 
+// TODO: poner la BASE_URL en un context global.
+const BASE_URL = 'http://192.168.0.4:3000'; // Eze
+// const BASE_URL = 'http://192.168.0.4:3000'; // Fer P
+// const BASE_URL = 'http://192.168.0.4:3000'; // Fer M
+// const BASE_URL = 'http://192.168.0.4:3000'; // Leo
+// const BASE_URL = 'http://192.168.0.4:3000'; // Lucho
+
 const divContainerStyle = {
   height: 800,  
   width: '100%',
@@ -36,11 +43,11 @@ function Home() {
 
   useEffect(() => {    
     async function fetchData() {
-      // TODO: sacar URL hardcodeada.
-      const carsResponse = await axios.get('http://192.168.0.140:3000/cars/');
+      
+      const carsResponse = await axios.get(`${BASE_URL}/cars/`);
       setCars(carsResponse.data);
 
-      const reservantionResponse = await axios.get('http://192.168.0.140:3000/reservations/');
+      const reservantionResponse = await axios.get(`${BASE_URL}/reservations/`);
       setReservations(reservantionResponse.data)
 
     }

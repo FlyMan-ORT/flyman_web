@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router,Link, Routes, Route } from 'react-router-dom';
-import Home from './Home';
-import Users from './Users';
-import Historic from './Historic';
+import Home from '../screens/Home';
+import Users from '../screens/Users';
+import Historic from '../screens/Historic';
 import Button from '@mui/material/Button';
 
 const linkStyle = {  
