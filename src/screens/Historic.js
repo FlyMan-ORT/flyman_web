@@ -4,6 +4,12 @@ import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import LocalCarWashIcon from '@mui/icons-material/LocalCarWash';
 import Modal from 'react-bootstrap/Modal';
 
+// TODO: poner la BASE_URL en un context global.
+const BASE_URL = 'http://192.168.0.4:3000'; // Eze
+// const BASE_URL = 'http://192.168.0.4:3000'; // Fer P
+// const BASE_URL = 'http://192.168.0.4:3000'; // Fer M
+// const BASE_URL = 'http://192.168.0.4:3000'; // Leo
+// const BASE_URL = 'http://192.168.0.4:3000'; // Lucho
 
 const divContainerStyle = {
   height: 800,
@@ -56,7 +62,7 @@ function Historic() {
   useEffect(() => {
     async function fetchData() {
       // TODO: sacar URL hardcodeada.
-      const servicesResponse = (await axios.get('http://192.168.0.140:3000/services/')).data;
+      const servicesResponse = (await axios.get(`${BASE_URL}/services/`)).data;
 
       const servicesForTable = servicesResponse.map((service) => {
         return {

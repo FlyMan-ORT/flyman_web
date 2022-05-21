@@ -9,6 +9,13 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import Form from 'react-bootstrap/Form';
 import ButtonBootstrap from 'react-bootstrap/Button'
 
+// TODO: poner la BASE_URL en un context global.
+const BASE_URL = 'http://192.168.0.4:3000'; // Eze
+// const BASE_URL = 'http://192.168.0.4:3000'; // Fer P
+// const BASE_URL = 'http://192.168.0.4:3000'; // Fer M
+// const BASE_URL = 'http://192.168.0.4:3000'; // Leo
+// const BASE_URL = 'http://192.168.0.4:3000'; // Lucho
+
 const divContainerStyle = {
   height: 800,
   width: '100%',
@@ -18,9 +25,7 @@ const divContainerStyle = {
   paddingRight: 50,
 };
 
-
 function Users() {
-
   const [editModalShow, setEditModalShow] = useState(false);
   const [deleteModalShow, setDeleteModalShow] = useState(false);
   const [newUserModalShow, setNewUserModalShow] = useState(false);
@@ -32,21 +37,18 @@ function Users() {
   const [assigmentsModalShow, setAssigmentsModalShow] = useState(false);
   const [reservesByUser, setReservesByUser] = useState([]);
 
-  
-
-
   async function createUser(user) {
-    const createUserResponse = (await axios.post(`http://192.168.0.140:3000/users/register`, user)).data;
+    const createUserResponse = (await axios.post(`${BASE_URL}/users/register`, user)).data;
     setUpdateFlag(!updateFlag)
   }
 
   async function updateUser(userId) {
-    const updateUserResponse = (await axios.patch(`http://192.168.0.140:3000/users/${userId}`, newUser)).data;
+    const updateUserResponse = (await axios.patch(`${BASE_URL}/users/${userId}`, newUser)).data;
     setUpdateFlag(!updateFlag)
   }
 
   async function deleteUser(userId) {
-    const deleteResponse = (await axios.delete(`http://192.168.0.140:3000/users/${userId}`)).data;
+    const deleteResponse = (await axios.delete(`${BASE_URL}/users/${userId}`)).data;
     setUpdateFlag(!updateFlag)
   }
 
@@ -108,9 +110,8 @@ function Users() {
 
   useEffect(() => {
     async function fetchData() {
-      // TODO: sacar URL hardcodeada.
-      const usersResponse = (await axios.get('http://192.168.0.140:3000/users/')).data;
-      const reserves = (await axios.get(`http://192.168.0.140:3000/reservations/`)).data;
+      const usersResponse = (await axios.get(`${BASE_URL}/users/`)).data;
+      const reserves = (await axios.get(`${BASE_URL}/reservations/`)).data;
 
       console.log(reserves[0].id)
       console.log('day',new Date(reserves[0].startTime).getDate())
