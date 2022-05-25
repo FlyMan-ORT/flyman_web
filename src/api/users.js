@@ -1,10 +1,6 @@
 import axios from 'axios';
+import { BASE_URL } from '../utils/connections';
 
-// const BASE_URL = 'http://192.168.68.110:3000'; // Leo
-// const BASE_URL = 'http://192.168.68.110:3000'; // Fer P
-// const BASE_URL = 'http://192.168.68.110:3000'; // Lucho
-// const BASE_URL = 'http://192.168.68.110:3000'; // Fer M
-const BASE_URL = 'http://192.168.0.4:3000'; // Eze
 
 const login = async (email, password) => {
     const url = `${BASE_URL}/users/login`

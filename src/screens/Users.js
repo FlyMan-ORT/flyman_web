@@ -8,13 +8,7 @@ import Modal from 'react-bootstrap/Modal';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import Form from 'react-bootstrap/Form';
 import ButtonBootstrap from 'react-bootstrap/Button'
-
-// TODO: poner la BASE_URL en un context global.
-const BASE_URL = 'http://192.168.0.4:3000'; // Eze
-// const BASE_URL = 'http://192.168.0.4:3000'; // Fer P
-// const BASE_URL = 'http://192.168.0.4:3000'; // Fer M
-// const BASE_URL = 'http://192.168.0.4:3000'; // Leo
-// const BASE_URL = 'http://192.168.0.4:3000'; // Lucho
+import { BASE_URL } from '../utils/connections';
 
 const divContainerStyle = {
   height: 800,

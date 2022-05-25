@@ -5,13 +5,7 @@ import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import Modal from 'react-bootstrap/Modal';
-
-// TODO: poner la BASE_URL en un context global.
-const BASE_URL = 'http://192.168.0.4:3000'; // Eze
-// const BASE_URL = 'http://192.168.0.4:3000'; // Fer P
-// const BASE_URL = 'http://192.168.0.4:3000'; // Fer M
-// const BASE_URL = 'http://192.168.0.4:3000'; // Leo
-// const BASE_URL = 'http://192.168.0.4:3000'; // Lucho
+import { BASE_URL } from '../utils/connections';
 
 const divContainerStyle = {
   height: 800,  
