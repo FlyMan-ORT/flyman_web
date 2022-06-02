@@ -9,5 +9,5 @@ const getConnection = (nombre) => {
   return connections[`${nombre}`];
 }
 
-export const BASE_URL = getConnection('fermin');
+export const BASE_URL = getConnection('eze');
 

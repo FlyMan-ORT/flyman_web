@@ -37,7 +37,7 @@ function Users() {
   }
 
   async function updateUser(userId) {
-    const updateUserResponse = (await axios.patch(`${BASE_URL}/users/${userId}`, newUser)).data;
+    const updateUserResponse = (await axios.patch(`${BASE_URL}/users/${userId}`, userForEditOrDeletion)).data;
     setUpdateFlag(!updateFlag)
   }
 
@@ -151,27 +151,27 @@ function Users() {
                 <Form.Control
                   type="text"
                   defaultValue={userForEditOrDeletion.name}
-                  onChange={e => setNewUser({ ...userForEditOrDeletion, name: e.target.value })}
+                  onChange={e => setUserForEditOrDeletion({ ...userForEditOrDeletion, name: e.target.value })}
                   autoFocus
                 />
                 <Form.Label>Email</Form.Label>
                 <Form.Control
                   type="email"
                   defaultValue={userForEditOrDeletion.email}
-                  onChange={e => setNewUser({ ...userForEditOrDeletion, email: e.target.value })}
+                  onChange={e => setUserForEditOrDeletion({ ...userForEditOrDeletion, email: e.target.value })}
                   autoFocus
                 />
                 <Form.Label>Telefono</Form.Label>
                 <Form.Control
                   type="phone"
                   defaultValue={userForEditOrDeletion.phone}
-                  onChange={e => setNewUser({ ...userForEditOrDeletion, phone: e.target.value })}
+                  onChange={e => setUserForEditOrDeletion({ ...userForEditOrDeletion, phone: e.target.value })}
                   autoFocus
                 />
                 <Form.Label>Password</Form.Label>
                 <Form.Control
                   type="password"
-                  onChange={e => setNewUser({ ...userForEditOrDeletion, password: e.target.value })}
+                  onChange={e => setUserForEditOrDeletion({ ...userForEditOrDeletion, password: e.target.value })}
                   autoFocus
                 />
               </Form.Group>
