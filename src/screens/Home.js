@@ -5,10 +5,14 @@ import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import Modal from 'react-bootstrap/Modal';
+import Form from 'react-bootstrap/Form';
+import ButtonBootstrap from 'react-bootstrap/Button'
+import { getMaintenanceUsers } from '../api/users';
 import { BASE_URL } from '../utils/connections';
+import { dateToString } from '../utils/dateParsers';
 
 const divContainerStyle = {
-  height: 800,  
+  height: 800,
   width: '100%',
   display: 'flex',
   flexDirection: 'column',
@@ -19,7 +23,7 @@ const divContainerStyle = {
 const mapModalStyle = {
   display: 'flex',
   flexDirection: 'row',
-  justifyContent:'center'  
+  justifyContent: 'center'
 }
 
 function Home() {
@@ -29,29 +33,38 @@ function Home() {
   const [selectedCarReservations, setSelectedCarReservations] = useState([])
   const [reservationsModalShow, setReservationsModalShow] = useState(false)
   const [mapViewModalShow, setMapViewModalShow] = useState(false)
-  const [carForMapView, setCarForMapView] = useState({position:{latitude:0,longitude:0}})
+  const [carForMapView, setCarForMapView] = useState({ position: { latitude: 0, longitude: 0 } })
   const [sourceForMap, setSourceForMap] = useState('')
+  const [createReserveModalShow, setCreateReserveModalShow] = useState(false)
+  const [maintenanceUsers, setMaintenanceUsers] = useState([])
+
 
   const handleCloseReservationModal = () => setReservationsModalShow(false);
-  const handleCloseMapViewModal = () => setMapViewModalShow(false);  
+  const handleCloseMapViewModal = () => setMapViewModalShow(false);
+  const handleCloseCreateReserveModal = () => setCreateReserveModalShow(false);
 
-  useEffect(() => {    
+  useEffect(() => {
     async function fetchData() {
-      
+
       const carsResponse = await axios.get(`${BASE_URL}/cars/`);
       setCars(carsResponse.data);
 
       const reservantionResponse = await axios.get(`${BASE_URL}/reservations/`);
       setReservations(reservantionResponse.data)
 
+      const fetchMaintenanceUsers = await getMaintenanceUsers();
+      const valuesMaintananceUser = fetchMaintenanceUsers.map((m) => { return { value: m._id, label: m.name } })
+      setMaintenanceUsers(valuesMaintananceUser)
+
+
     }
     fetchData();
   }, [])
 
-  useEffect(() => {  
+  useEffect(() => {
 
-    setSourceForMap('<iframe width = "800" height = "650" style = "border:0" loading = "lazy" allowfullscreen referrerpolicy = "no-referrer-when-downgrade" src = "https://maps.google.com/maps?q='+carForMapView.position.latitude+','+carForMapView.position.longitude+'&hl=es&z=14&amp;output=embed"></iframe >')
-  }, [mapViewModalShow])    
+    setSourceForMap('<iframe width = "800" height = "650" style = "border:0" loading = "lazy" allowfullscreen referrerpolicy = "no-referrer-when-downgrade" src = "https://maps.google.com/maps?q=' + carForMapView.position.latitude + ',' + carForMapView.position.longitude + '&hl=es&z=14&amp;output=embed"></iframe >')
+  }, [mapViewModalShow])
 
   useEffect(() => {
     //separo los autos con reserva
@@ -82,9 +95,9 @@ function Home() {
         idParkingSlot: car.idParkingSlot,
         lastModifiedDate: car.lastModifiedDate,
         reservations: reservations.filter(r => r.car.plate === car.plate),
-        position: car.position ? {latitude:car.position.latitude, longitude: car.position.longitude} : {latitude:0, longitude: 0}
+        position: car.position ? { latitude: car.position.latitude, longitude: car.position.longitude } : { latitude: 0, longitude: 0 }
       }
-    })    
+    })
     setCarsWithReservationFirst(carsForTable);
   }, [cars])
 
@@ -95,8 +108,8 @@ function Home() {
       type: 'actions',
       getActions: (params) => [
         <GridActionsCellItem icon={<FormatListBulletedIcon fontSize='large' />}
-          onClick={() => {            
-            setSelectedCarReservations(params.row.reservations)            
+          onClick={() => {
+            setSelectedCarReservations(params.row.reservations)
             setReservationsModalShow(true)
           }
           }
@@ -108,18 +121,18 @@ function Home() {
       field: 'Asignar',
       type: 'actions',
       getActions: (params) => [
-        <GridActionsCellItem icon={<AssignmentIndIcon fontSize='large' />} onClick={() => alert('' + params.row.plate + ' asignado a Pepelui')} label="Delete" />
+        <GridActionsCellItem icon={<AssignmentIndIcon fontSize='large' />} onClick={() => setCreateReserveModalShow(true)} />
       ]
     },
     {
-      headerName: 'Ver en mapa', 
-      field: 'map',     
+      headerName: 'Ver en mapa',
+      field: 'map',
       type: 'actions',
       getActions: (params) => [
         <GridActionsCellItem icon={<LocationOnIcon fontSize='large' />}
-          onClick={async () => { 
-            console.log(params.row) 
-            setCarForMapView(params.row)                    
+          onClick={async () => {
+            console.log(params.row)
+            setCarForMapView(params.row)
             setMapViewModalShow(true)
           }
           }
@@ -170,7 +183,46 @@ function Home() {
         <Modal.Body style={mapModalStyle}>
           <div dangerouslySetInnerHTML={{ __html: sourceForMap }}></div>
         </Modal.Body>
-        
+
+      </Modal>
+      <Modal show={createReserveModalShow}>
+        <Modal.Header >
+          <Modal.Title>Asignar reserva</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+              <Form.Label>Elegir dia</Form.Label>
+              <Form.Control
+                type="date"
+                min={dateToString(new Date())}
+                autoFocus
+              />
+              <Form.Label>Elegir horario</Form.Label>
+              <Form.Control
+                type="time"
+                autoFocus
+              />
+              <Form.Label>Elegir operario</Form.Label>
+              <Form.Select aria-label="Default select example">
+                {maintenanceUsers.map((m) => (
+                  <option value={m.value}>{m.label}</option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <ButtonBootstrap variant="secondary" onClick={() => { setCreateReserveModalShow(false) }}>
+            Cerrar
+          </ButtonBootstrap>
+          <ButtonBootstrap variant="primary" onClick={() => {
+            setCreateReserveModalShow(false)
+          }
+          }>
+            Guardar cambios
+          </ButtonBootstrap>
+        </Modal.Footer>
       </Modal>
     </div>
   );

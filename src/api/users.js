@@ -14,4 +14,17 @@ const login = async (email, password) => {
     return response.data;
 }
 
-export { login }
+const getMaintenanceUsers = async () => {
+    const url = `${BASE_URL}/users`
+    let response;
+    try {
+        response = await axios.get(url);
+    } catch (error) {
+        throw error;
+    }
+
+    return response.data;
+}
+
+
+export { login, getMaintenanceUsers }
