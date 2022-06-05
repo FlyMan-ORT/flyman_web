@@ -37,11 +37,20 @@ function Home() {
   const [sourceForMap, setSourceForMap] = useState('')
   const [createReserveModalShow, setCreateReserveModalShow] = useState(false)
   const [maintenanceUsers, setMaintenanceUsers] = useState([])
-
-
+  const [reservationSelectedDay, setDiaReserva] = useState("")
+  const [reservationSelectedTime, setHoraReserva] = useState("")
+  const [reservationSelectedEmployee, setMailDeOperario] = useState("")
+  const [carForReservation, setCarForReservation] = useState({})  
+  
   const handleCloseReservationModal = () => setReservationsModalShow(false);
   const handleCloseMapViewModal = () => setMapViewModalShow(false);
   const handleCloseCreateReserveModal = () => setCreateReserveModalShow(false);
+
+  async function createReservation(car, employeeMail,reservationDay,reservationTime) {
+    const reservation = {car, employeeMail,reservationDay,reservationTime}    
+    await axios.post(`${BASE_URL}/reservations/`, reservation)
+    
+  }
 
   useEffect(() => {
     async function fetchData() {
@@ -53,7 +62,7 @@ function Home() {
       setReservations(reservantionResponse.data)
 
       const fetchMaintenanceUsers = await getMaintenanceUsers();
-      const valuesMaintananceUser = fetchMaintenanceUsers.map((m) => { return { value: m._id, label: m.name } })
+      const valuesMaintananceUser = fetchMaintenanceUsers.map((m) => { return { value: m.email, label: m.name } })
       setMaintenanceUsers(valuesMaintananceUser)
 
 
@@ -121,7 +130,13 @@ function Home() {
       field: 'Asignar',
       type: 'actions',
       getActions: (params) => [
-        <GridActionsCellItem icon={<AssignmentIndIcon fontSize='large' />} onClick={() => setCreateReserveModalShow(true)} />
+        <GridActionsCellItem icon={<AssignmentIndIcon fontSize='large' />} 
+        onClick={() => {
+          setCarForReservation(cars.find(car => car.plate === params.row.plate))
+          setCreateReserveModalShow(true)
+        }
+        } 
+        />
       ]
     },
     {
@@ -130,8 +145,7 @@ function Home() {
       type: 'actions',
       getActions: (params) => [
         <GridActionsCellItem icon={<LocationOnIcon fontSize='large' />}
-          onClick={async () => {
-            console.log(params.row)
+          onClick={async () => {            
             setCarForMapView(params.row)
             setMapViewModalShow(true)
           }
@@ -196,15 +210,19 @@ function Home() {
               <Form.Control
                 type="date"
                 min={dateToString(new Date())}
-                autoFocus
+                onChange={e => {setDiaReserva(e.target.value)}}
+                autoFocus                
               />
               <Form.Label>Elegir horario</Form.Label>
               <Form.Control
                 type="time"
+                onChange={e => { setHoraReserva(e.target.value)}}
                 autoFocus
               />
               <Form.Label>Elegir operario</Form.Label>
-              <Form.Select aria-label="Default select example">
+              <Form.Select aria-label="Default select example"
+                onChange={e => { setMailDeOperario(e.target.value)}}
+              >
                 {maintenanceUsers.map((m) => (
                   <option value={m.value}>{m.label}</option>
                 ))}
@@ -217,6 +235,7 @@ function Home() {
             Cerrar
           </ButtonBootstrap>
           <ButtonBootstrap variant="primary" onClick={() => {
+            createReservation(carForReservation, reservationSelectedEmployee, reservationSelectedDay, reservationSelectedTime)
             setCreateReserveModalShow(false)
           }
           }>
