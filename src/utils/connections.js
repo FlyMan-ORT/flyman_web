@@ -11,4 +11,3 @@ const getConnection = (nombre) => {
 }
 
 export const BASE_URL = getConnection('fer');
-
