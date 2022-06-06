@@ -28,7 +28,7 @@ function NavBar() {
         <Router>
             <div style={navBarDivStyle}>
                 <Button variant="contained" style={buttonStyle} >
-                    <Link to="/" style={linkStyle}>Reservas</Link>
+                    <Link to="/" style={linkStyle}>Autos</Link>
                 </Button>
                 <Button variant="contained" style={buttonStyle}>
                     <Link to="/Users" style={linkStyle}>Usuarios</Link>
