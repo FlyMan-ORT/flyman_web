@@ -37,11 +37,13 @@ function Home() {
   const [sourceForMap, setSourceForMap] = useState('')
   const [createReserveModalShow, setCreateReserveModalShow] = useState(false)
   const [maintenanceUsers, setMaintenanceUsers] = useState([])
-  const [reservationSelectedDay, setDiaReserva] = useState("")
-  const [reservationSelectedTime, setHoraReserva] = useState("")
+  const [reservationSelectedDay, setDiaReserva] = useState(dateToString(new Date()))
+  console.log("reservationSelectedDay: " + reservationSelectedDay)
+  const [reservationSelectedTime, setHoraReserva] = useState("08:00")
+  console.log("reservationSelectedTime: " + reservationSelectedTime)
   const [reservationSelectedEmployee, setMailDeOperario] = useState("")
+  console.log("reservationSelectedEmployee: " + reservationSelectedEmployee)
   const [carForReservation, setCarForReservation] = useState({})  
-  
   const handleCloseReservationModal = () => setReservationsModalShow(false);
   const handleCloseMapViewModal = () => setMapViewModalShow(false);
   const handleCloseCreateReserveModal = () => setCreateReserveModalShow(false);
@@ -201,7 +203,7 @@ function Home() {
       </Modal>
       <Modal show={createReserveModalShow}>
         <Modal.Header >
-          <Modal.Title>Asignar reserva</Modal.Title>
+          <Modal.Title>Asignar reserva a operario</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
@@ -210,17 +212,20 @@ function Home() {
               <Form.Control
                 type="date"
                 min={dateToString(new Date())}
+                defaultValue={reservationSelectedDay}
                 onChange={e => {setDiaReserva(e.target.value)}}
                 autoFocus                
               />
               <Form.Label>Elegir horario</Form.Label>
               <Form.Control
                 type="time"
+                defaultValue="08:00"
                 onChange={e => { setHoraReserva(e.target.value)}}
                 autoFocus
               />
               <Form.Label>Elegir operario</Form.Label>
-              <Form.Select aria-label="Default select example"
+              <Form.Select 
+                aria-label="Default select example"
                 onChange={e => { setMailDeOperario(e.target.value)}}
               >
                 {maintenanceUsers.map((m) => (
@@ -231,15 +236,22 @@ function Home() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <ButtonBootstrap variant="secondary" onClick={() => { setCreateReserveModalShow(false) }}>
-            Cerrar
+          <ButtonBootstrap variant="secondary" onClick={() => { 
+            setCreateReserveModalShow(false)
+            setDiaReserva(dateToString(new Date()))
+            setHoraReserva("08:00")
+            setMailDeOperario("") 
+            }
+            }>Cerrar
           </ButtonBootstrap>
           <ButtonBootstrap variant="primary" onClick={() => {
             createReservation(carForReservation, reservationSelectedEmployee, reservationSelectedDay, reservationSelectedTime)
             setCreateReserveModalShow(false)
+            setDiaReserva(dateToString(new Date()))
+            setHoraReserva("08:00")
+            setMailDeOperario("")
           }
-          }>
-            Guardar cambios
+          }>Asignar reserva
           </ButtonBootstrap>
         </Modal.Footer>
       </Modal>
