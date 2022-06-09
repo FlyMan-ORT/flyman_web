@@ -9,6 +9,8 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import Form from 'react-bootstrap/Form';
 import ButtonBootstrap from 'react-bootstrap/Button'
 import { BASE_URL } from '../utils/connections';
+import moment from 'moment';
+import Card from 'react-bootstrap/Card'
 
 const divContainerStyle = {
   height: 800,
@@ -64,15 +66,13 @@ function Users() {
       width: '120',
       getActions: (params) => [
         <GridActionsCellItem icon={<AssignmentIcon fontSize='large' />}
-          onClick={() => {            
-            setUserForEditOrDeletion(params.row);            
-            setReservesByUser(reserves.filter((r)=>
+          onClick={() => {
+            setUserForEditOrDeletion(params.row);
+            setReservesByUser(reserves.filter((r) =>
               r.user.email === params.row.email &&
               r.bookingType === 'MAINTENANCE' &&
-              new Date(r.startTime).getDate() === new Date().getDate() &&
-              new Date(r.startTime).getMonth() === new Date().getMonth() &&
-              new Date(r.startTime).getFullYear() === new Date().getFullYear()
-              ))
+              moment(r.startTime).isSame(moment(), 'day')
+            ))
             setAssigmentsModalShow(true);
           }} label="Assigment" />
       ]
@@ -254,11 +254,27 @@ function Users() {
           </Modal.Footer>
         </Modal>
         <Modal show={assigmentsModalShow} onHide={() => {
-          setAssigmentsModalShow(false)}} size="sm">
+          setAssigmentsModalShow(false)
+        }} size="sm">
           <Modal.Header closeButton>
             <Modal.Title>Asignaciones</Modal.Title>
           </Modal.Header>
-          <Modal.Body>{reservesByUser.map((r)=>{return(<div><p>{r.startTime} : {r.endTime}</p></div>)})}</Modal.Body>
+          <Modal.Body>{reservesByUser.map((r) => { 
+            return (             
+            <Card border="primary" style={{ marginBottom: 10 }}>
+              <Card.Header style={{ alignItems: 'center' }}>
+                <b>{moment(r.startTime).format('hh:mm A')} : {moment(r.endTime).format('hh:mm A')}</b>
+                </Card.Header>
+              <Card.Body>
+                <Card.Text>Patente: {r.car.plate}</Card.Text>
+                <Card.Text>Parking: </Card.Text>
+                <Card.Text>Ubicacion: </Card.Text>
+              </Card.Body>
+            </Card>       
+            )})}
+
+
+          </Modal.Body>
         </Modal>
       </div>
 
