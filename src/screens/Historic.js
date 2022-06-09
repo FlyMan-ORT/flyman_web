@@ -55,7 +55,7 @@ function Historic() {
   useEffect(() => {
     async function fetchData() {
       // TODO: sacar URL hardcodeada.
-      const servicesResponse = (await axios.get(`${BASE_URL}/services/`)).data;
+      const servicesResponse = (await axios.get(`${process.env.REACT_APP_BASE_URL}/services/`)).data;
 
       const servicesForTable = servicesResponse.map((service) => {
         return {
