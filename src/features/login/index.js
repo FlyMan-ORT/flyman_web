@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { BASE_URL } from '../../utils/connections';
 
 const initialState = {
   pending: false,
@@ -9,7 +8,8 @@ const initialState = {
 }
 
 export const postLogin = createAsyncThunk('auth/login', async (params) => {
-  const url = `${BASE_URL}/users/login`;
+  const url = `${process.env.REACT_APP_BASE_URL}/users/login`;
+  console.log(url);
   const response = await axios.post(url, { email: params.email, password: params.password });
   return response;
 });

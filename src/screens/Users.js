@@ -8,7 +8,6 @@ import Modal from 'react-bootstrap/Modal';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import Form from 'react-bootstrap/Form';
 import ButtonBootstrap from 'react-bootstrap/Button'
-import { BASE_URL } from '../utils/connections';
 
 const divContainerStyle = {
   height: 800,
@@ -32,17 +31,17 @@ function Users() {
   const [reservesByUser, setReservesByUser] = useState([]);
 
   async function createUser(user) {
-    const createUserResponse = (await axios.post(`${BASE_URL}/users/register`, user)).data;
+    const createUserResponse = (await axios.post(`${process.env.REACT_APP_BASE_URL}/users/register`, user)).data;
     setUpdateFlag(!updateFlag)
   }
 
   async function updateUser(userId) {
-    const updateUserResponse = (await axios.patch(`${BASE_URL}/users/${userId}`, userForEditOrDeletion)).data;
+    const updateUserResponse = (await axios.patch(`${process.env.REACT_APP_BASE_URL}/users/${userId}`, userForEditOrDeletion)).data;
     setUpdateFlag(!updateFlag)
   }
 
   async function deleteUser(userId) {
-    const deleteResponse = (await axios.delete(`${BASE_URL}/users/${userId}`)).data;
+    const deleteResponse = (await axios.delete(`${process.env.REACT_APP_BASE_URL}/users/${userId}`)).data;
     setUpdateFlag(!updateFlag)
   }
 
@@ -64,15 +63,15 @@ function Users() {
       width: '120',
       getActions: (params) => [
         <GridActionsCellItem icon={<AssignmentIcon fontSize='large' />}
-          onClick={() => {            
-            setUserForEditOrDeletion(params.row);            
-            setReservesByUser(reserves.filter((r)=>
+          onClick={() => {
+            setUserForEditOrDeletion(params.row);
+            setReservesByUser(reserves.filter((r) =>
               r.user.email === params.row.email &&
               r.type === 'M' &&
               new Date(r.startTime).getDate() === new Date().getDate() &&
               new Date(r.startTime).getMonth() === new Date().getMonth() &&
               new Date(r.startTime).getFullYear() === new Date().getFullYear()
-              ))
+            ))
             setAssigmentsModalShow(true);
           }} label="Assigment" />
       ]
@@ -104,13 +103,13 @@ function Users() {
 
   useEffect(() => {
     async function fetchData() {
-      const usersResponse = (await axios.get(`${BASE_URL}/users/`)).data;
-      const reserves = (await axios.get(`${BASE_URL}/reservations/`)).data;
+      const usersResponse = (await axios.get(`${process.env.REACT_APP_BASE_URL}/users/`)).data;
+      const reserves = (await axios.get(`${process.env.REACT_APP_BASE_URL}/reservations/`)).data;
 
       console.log(reserves[0].id)
-      console.log('day',new Date(reserves[0].startTime).getDate())
-      console.log('mes',new Date(reserves[0].startTime).getMonth())
-      console.log('anmio',new Date(reserves[0].startTime).getFullYear())
+      console.log('day', new Date(reserves[0].startTime).getDate())
+      console.log('mes', new Date(reserves[0].startTime).getMonth())
+      console.log('anmio', new Date(reserves[0].startTime).getFullYear())
 
       const usersForTable = usersResponse.map((user) => {
         return {
@@ -259,11 +258,12 @@ function Users() {
           </Modal.Footer>
         </Modal>
         <Modal show={assigmentsModalShow} onHide={() => {
-          setAssigmentsModalShow(false)}} size="sm">
+          setAssigmentsModalShow(false)
+        }} size="sm">
           <Modal.Header closeButton>
             <Modal.Title>Asignaciones</Modal.Title>
           </Modal.Header>
-          <Modal.Body>{reservesByUser.map((r)=>{return(<div><p>{r.startTime} : {r.endTime}</p></div>)})}</Modal.Body>
+          <Modal.Body>{reservesByUser.map((r) => { return (<div><p>{r.startTime} : {r.endTime}</p></div>) })}</Modal.Body>
         </Modal>
       </div>
 
