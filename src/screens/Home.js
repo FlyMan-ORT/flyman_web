@@ -28,21 +28,18 @@ const mapModalStyle = {
 
 function Home() {
   const [cars, setCars] = useState([]);
-  const [reservations, setReservations] = useState([]);
-  const [carsWithReservationFirst, setCarsWithReservationFirst] = useState([]);
-  const [selectedCarReservations, setSelectedCarReservations] = useState([])
+  const [reservations, setReservations] = useState([]);  
+  const [carsWithReservationFirst, setCarsWithReservationFirst] = useState([]);  
+  const [selectedCarReservations, setSelectedCarReservations] = useState([])  
   const [reservationsModalShow, setReservationsModalShow] = useState(false)
   const [mapViewModalShow, setMapViewModalShow] = useState(false)
   const [carForMapView, setCarForMapView] = useState({ position: { latitude: 0, longitude: 0 } })
   const [sourceForMap, setSourceForMap] = useState('')
   const [createReserveModalShow, setCreateReserveModalShow] = useState(false)
   const [maintenanceUsers, setMaintenanceUsers] = useState([])
-  const [reservationSelectedDay, setDiaReserva] = useState(dateToString(new Date()))
-  console.log("reservationSelectedDay: " + reservationSelectedDay)
-  const [reservationSelectedTime, setHoraReserva] = useState("08:00")
-  console.log("reservationSelectedTime: " + reservationSelectedTime)
-  const [reservationSelectedEmployee, setMailDeOperario] = useState("")
-  console.log("reservationSelectedEmployee: " + reservationSelectedEmployee)
+  const [reservationSelectedDay, setDiaReserva] = useState(dateToString(new Date()))  
+  const [reservationSelectedTime, setHoraReserva] = useState("08:00")  
+  const [reservationSelectedEmployee, setMailDeOperario] = useState("")  
   const [carForReservation, setCarForReservation] = useState({})  
   const handleCloseReservationModal = () => setReservationsModalShow(false);
   const handleCloseMapViewModal = () => setMapViewModalShow(false);
@@ -95,7 +92,7 @@ function Home() {
     filteredCars.push(...restOfcars)
 
     //lo mapeo para la tabla
-    const carsForTable = filteredCars.map((car) => {
+    const carsForTable = filteredCars.map((car) => {      
       return {
         id: car._id,
         plate: car.plate,
@@ -104,8 +101,7 @@ function Home() {
         fuelType: car.fuelType,
         parkingName: car.parkingName,
         idParkingSlot: car.idParkingSlot,
-        lastModifiedDate: car.lastModifiedDate,
-        reservations: reservations.filter(r => r.car.plate === car.plate),
+        lastModifiedDate: car.lastModifiedDate,        
         position: car.position ? { latitude: car.position.latitude, longitude: car.position.longitude } : { latitude: 0, longitude: 0 }
       }
     })
@@ -120,7 +116,7 @@ function Home() {
       getActions: (params) => [
         <GridActionsCellItem icon={<FormatListBulletedIcon fontSize='large' />}
           onClick={() => {
-            setSelectedCarReservations(params.row.reservations)
+            setSelectedCarReservations(reservations.filter(r => r.car.plate === params.row.plate))                
             setReservationsModalShow(true)
           }
           }
@@ -201,7 +197,7 @@ function Home() {
         </Modal.Body>
 
       </Modal>
-      <Modal show={createReserveModalShow}>
+      <Modal show={createReserveModalShow} onHide={handleCloseCreateReserveModal}>
         <Modal.Header >
           <Modal.Title>Asignar reserva a operario</Modal.Title>
         </Modal.Header>
