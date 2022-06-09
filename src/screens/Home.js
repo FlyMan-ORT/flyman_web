@@ -8,7 +8,6 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import ButtonBootstrap from 'react-bootstrap/Button'
 import { getMaintenanceUsers } from '../api/users';
-import { BASE_URL } from '../utils/connections';
 import { dateToString } from '../utils/dateParsers';
 
 const divContainerStyle = {
@@ -37,27 +36,37 @@ function Home() {
   const [sourceForMap, setSourceForMap] = useState('')
   const [createReserveModalShow, setCreateReserveModalShow] = useState(false)
   const [maintenanceUsers, setMaintenanceUsers] = useState([])
+
+  const [reservationSelectedDay, setDiaReserva] = useState(dateToString(new Date()))
+  console.log("reservationSelectedDay: " + reservationSelectedDay)
+  const [reservationSelectedTime, setHoraReserva] = useState("08:00")
+  console.log("reservationSelectedTime: " + reservationSelectedTime)
+  const [reservationSelectedEmployee, setMailDeOperario] = useState("")
+  console.log("reservationSelectedEmployee: " + reservationSelectedEmployee)
+  const [carForReservation, setCarForReservation] = useState({})
+
   const [reservationSelectedDay, setDiaReserva] = useState(dateToString(new Date()))  
   const [reservationSelectedTime, setHoraReserva] = useState("08:00")  
   const [reservationSelectedEmployee, setMailDeOperario] = useState("")  
   const [carForReservation, setCarForReservation] = useState({})  
+
   const handleCloseReservationModal = () => setReservationsModalShow(false);
   const handleCloseMapViewModal = () => setMapViewModalShow(false);
   const handleCloseCreateReserveModal = () => setCreateReserveModalShow(false);
 
-  async function createReservation(car, employeeMail,reservationDay,reservationTime) {
-    const reservation = {car, employeeMail,reservationDay,reservationTime}    
-    await axios.post(`${BASE_URL}/reservations/`, reservation)
-    
+  async function createReservation(car, employeeMail, reservationDay, reservationTime) {
+    const reservation = { car, employeeMail, reservationDay, reservationTime }
+    await axios.post(`${process.env.REACT_APP_BASE_URL}/reservations/`, reservation)
+
   }
 
   useEffect(() => {
     async function fetchData() {
 
-      const carsResponse = await axios.get(`${BASE_URL}/cars/`);
+      const carsResponse = await axios.get(`${process.env.REACT_APP_BASE_URL}/cars/`);
       setCars(carsResponse.data);
 
-      const reservantionResponse = await axios.get(`${BASE_URL}/reservations/`);
+      const reservantionResponse = await axios.get(`${process.env.REACT_APP_BASE_URL}/reservations/`);
       setReservations(reservantionResponse.data)
 
       const fetchMaintenanceUsers = await getMaintenanceUsers();
@@ -128,12 +137,12 @@ function Home() {
       field: 'Asignar',
       type: 'actions',
       getActions: (params) => [
-        <GridActionsCellItem icon={<AssignmentIndIcon fontSize='large' />} 
-        onClick={() => {
-          setCarForReservation(cars.find(car => car.plate === params.row.plate))
-          setCreateReserveModalShow(true)
-        }
-        } 
+        <GridActionsCellItem icon={<AssignmentIndIcon fontSize='large' />}
+          onClick={() => {
+            setCarForReservation(cars.find(car => car.plate === params.row.plate))
+            setCreateReserveModalShow(true)
+          }
+          }
         />
       ]
     },
@@ -143,7 +152,7 @@ function Home() {
       type: 'actions',
       getActions: (params) => [
         <GridActionsCellItem icon={<LocationOnIcon fontSize='large' />}
-          onClick={async () => {            
+          onClick={async () => {
             setCarForMapView(params.row)
             setMapViewModalShow(true)
           }
@@ -209,20 +218,20 @@ function Home() {
                 type="date"
                 min={dateToString(new Date())}
                 defaultValue={reservationSelectedDay}
-                onChange={e => {setDiaReserva(e.target.value)}}
-                autoFocus                
+                onChange={e => { setDiaReserva(e.target.value) }}
+                autoFocus
               />
               <Form.Label>Elegir horario</Form.Label>
               <Form.Control
                 type="time"
                 defaultValue="08:00"
-                onChange={e => { setHoraReserva(e.target.value)}}
+                onChange={e => { setHoraReserva(e.target.value) }}
                 autoFocus
               />
               <Form.Label>Elegir operario</Form.Label>
-              <Form.Select 
+              <Form.Select
                 aria-label="Default select example"
-                onChange={e => { setMailDeOperario(e.target.value)}}
+                onChange={e => { setMailDeOperario(e.target.value) }}
               >
                 {maintenanceUsers.map((m) => (
                   <option value={m.value}>{m.label}</option>
@@ -232,13 +241,13 @@ function Home() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <ButtonBootstrap variant="secondary" onClick={() => { 
+          <ButtonBootstrap variant="secondary" onClick={() => {
             setCreateReserveModalShow(false)
             setDiaReserva(dateToString(new Date()))
             setHoraReserva("08:00")
-            setMailDeOperario("") 
-            }
-            }>Cerrar
+            setMailDeOperario("")
+          }
+          }>Cerrar
           </ButtonBootstrap>
           <ButtonBootstrap variant="primary" onClick={() => {
             createReservation(carForReservation, reservationSelectedEmployee, reservationSelectedDay, reservationSelectedTime)

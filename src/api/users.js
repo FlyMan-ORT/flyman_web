@@ -1,9 +1,7 @@
 import axios from 'axios';
-import { BASE_URL } from '../utils/connections';
-
 
 const login = async (email, password) => {
-    const url = `${BASE_URL}/users/login`
+    const url = `${process.env.REACT_APP_BASE_URL}/users/login`
     let response;
     try {
         response = await axios.post(url, { email, password });
@@ -15,7 +13,7 @@ const login = async (email, password) => {
 }
 
 const getMaintenanceUsers = async () => {
-    const url = `${BASE_URL}/users`
+    const url = `${process.env.REACT_APP_BASE_URL}/users`
     let response;
     try {
         response = await axios.get(url);

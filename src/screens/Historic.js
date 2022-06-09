@@ -3,7 +3,6 @@ import axios from 'axios';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import LocalCarWashIcon from '@mui/icons-material/LocalCarWash';
 import Modal from 'react-bootstrap/Modal';
-import { BASE_URL } from '../utils/connections';
 
 const divContainerStyle = {
   height: 800,
@@ -30,8 +29,8 @@ function Historic() {
       width: '70',
 
       getActions: (params) => [
-        <GridActionsCellItem icon={<LocalCarWashIcon/>} onClick={() => {
-          setServicesTasks(params.row.tasks)          
+        <GridActionsCellItem icon={<LocalCarWashIcon />} onClick={() => {
+          setServicesTasks(params.row.tasks)
           setDetailsModalShow(true)
         }
         }
@@ -56,7 +55,7 @@ function Historic() {
   useEffect(() => {
     async function fetchData() {
       // TODO: sacar URL hardcodeada.
-      const servicesResponse = (await axios.get(`${BASE_URL}/services/`)).data;
+      const servicesResponse = (await axios.get(`${process.env.REACT_APP_BASE_URL}/services/`)).data;
 
       const servicesForTable = servicesResponse.map((service) => {
         return {
@@ -66,9 +65,9 @@ function Historic() {
           userEmail: service.userEmail,
           startDate: (new Date(service.startDate)).toLocaleString('en-GB', { timeZone: 'UTC' }),
           endDate: (service.endDate ? (new Date(service.endDate)).toLocaleString('en-GB', { timeZone: 'UTC' }) : ""),
-          tasks:(service.tasks) ? service.tasks : []
+          tasks: (service.tasks) ? service.tasks : []
         }
-      })      
+      })
       setServices(servicesForTable);
     }
     fetchData();
@@ -87,7 +86,7 @@ function Historic() {
         <Modal.Header closeButton>
           <Modal.Title>Detalles del servicio</Modal.Title>
         </Modal.Header>
-        <Modal.Body>{serviceTasks.map(e => {return(<p>{e}</p>)})}</Modal.Body>
+        <Modal.Body>{serviceTasks.map(e => { return (<p>{e}</p>) })}</Modal.Body>
       </Modal>
     </div>
   );
