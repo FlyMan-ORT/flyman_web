@@ -8,7 +8,6 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import ButtonBootstrap from 'react-bootstrap/Button'
 import { getMaintenanceUsers } from '../api/users';
-import { BASE_URL } from '../utils/connections';
 import { dateToString } from '../utils/dateParsers';
 import moment from 'moment';
 import Card from 'react-bootstrap/Card'
@@ -43,23 +42,24 @@ function Home() {
   const [reservationSelectedTime, setHoraReserva] = useState(moment().startOf('hour').format('hh:mm'))  
   const [reservationSelectedEmployee, setMailDeOperario] = useState("")  
   const [carForReservation, setCarForReservation] = useState({})  
+
   const handleCloseReservationModal = () => setReservationsModalShow(false);
   const handleCloseMapViewModal = () => setMapViewModalShow(false);
   const handleCloseCreateReserveModal = () => setCreateReserveModalShow(false);
 
-  async function createReservation(car, employeeMail,reservationDay,reservationTime) {
-    const reservation = {car, employeeMail,reservationDay,reservationTime}    
-    await axios.post(`${BASE_URL}/reservations/`, reservation)
-    
+  async function createReservation(car, employeeMail, reservationDay, reservationTime) {
+    const reservation = { car, employeeMail, reservationDay, reservationTime }
+    await axios.post(`${process.env.REACT_APP_BASE_URL}/reservations/`, reservation)
+
   }
 
   useEffect(() => {
     async function fetchData() {
 
-      const carsResponse = await axios.get(`${BASE_URL}/cars/`);
+      const carsResponse = await axios.get(`${process.env.REACT_APP_BASE_URL}/cars/`);
       setCars(carsResponse.data);
 
-      const reservantionResponse = await axios.get(`${BASE_URL}/reservations/`);
+      const reservantionResponse = await axios.get(`${process.env.REACT_APP_BASE_URL}/reservations/`);
       setReservations(reservantionResponse.data)
 
       const fetchMaintenanceUsers = await getMaintenanceUsers();
@@ -130,12 +130,12 @@ function Home() {
       field: 'Asignar',
       type: 'actions',
       getActions: (params) => [
-        <GridActionsCellItem icon={<AssignmentIndIcon fontSize='large' />} 
-        onClick={() => {
-          setCarForReservation(cars.find(car => car.plate === params.row.plate))
-          setCreateReserveModalShow(true)
-        }
-        } 
+        <GridActionsCellItem icon={<AssignmentIndIcon fontSize='large' />}
+          onClick={() => {
+            setCarForReservation(cars.find(car => car.plate === params.row.plate))
+            setCreateReserveModalShow(true)
+          }
+          }
         />
       ]
     },
@@ -145,7 +145,7 @@ function Home() {
       type: 'actions',
       getActions: (params) => [
         <GridActionsCellItem icon={<LocationOnIcon fontSize='large' />}
-          onClick={async () => {            
+          onClick={async () => {
             setCarForMapView(params.row)
             setMapViewModalShow(true)
           }
@@ -216,8 +216,8 @@ function Home() {
                 type="date"
                 min={dateToString(new Date())}
                 defaultValue={reservationSelectedDay}
-                onChange={e => {setDiaReserva(e.target.value)}}
-                autoFocus                
+                onChange={e => { setDiaReserva(e.target.value) }}
+                autoFocus
               />
               <Form.Label>Elegir horario</Form.Label>
               <Form.Control
@@ -227,9 +227,9 @@ function Home() {
                 autoFocus
               />
               <Form.Label>Elegir operario</Form.Label>
-              <Form.Select 
+              <Form.Select
                 aria-label="Default select example"
-                onChange={e => { setMailDeOperario(e.target.value)}}
+                onChange={e => { setMailDeOperario(e.target.value) }}
               >
                 {maintenanceUsers.map((m) => (
                   <option value={m.value}>{m.label}</option>

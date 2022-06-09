@@ -34,17 +34,29 @@ function Users() {
   const [reservesByUser, setReservesByUser] = useState([]);
 
   async function createUser(user) {
+
+    const createUserResponse = (await axios.post(`${process.env.REACT_APP_BASE_URL}/users/register`, user)).data;
+
     await axios.post(`${BASE_URL}/users/register`, user).data;
+
     setUpdateFlag(!updateFlag)
   }
 
   async function updateUser(userId) {
+
+    const updateUserResponse = (await axios.patch(`${process.env.REACT_APP_BASE_URL}/users/${userId}`, userForEditOrDeletion)).data;
+
     await axios.patch(`${BASE_URL}/users/${userId}`, userForEditOrDeletion).data;
+
     setUpdateFlag(!updateFlag)
   }
 
   async function deleteUser(userId) {
+
+    const deleteResponse = (await axios.delete(`${process.env.REACT_APP_BASE_URL}/users/${userId}`)).data;
+
     await axios.delete(`${BASE_URL}/users/${userId}`).data;
+
     setUpdateFlag(!updateFlag)
   }
 
@@ -104,8 +116,14 @@ function Users() {
 
   useEffect(() => {
     async function fetchData() {
-      const usersResponse = (await axios.get(`${BASE_URL}/users/`)).data;
-      const reserves = (await axios.get(`${BASE_URL}/reservations/`)).data;
+      const usersResponse = (await axios.get(`${process.env.REACT_APP_BASE_URL}/users/`)).data;
+      const reserves = (await axios.get(`${process.env.REACT_APP_BASE_URL}/reservations/`)).data;
+
+
+      console.log(reserves[0].id)
+      console.log('day', new Date(reserves[0].startTime).getDate())
+      console.log('mes', new Date(reserves[0].startTime).getMonth())
+      console.log('anmio', new Date(reserves[0].startTime).getFullYear())
 
       const usersForTable = usersResponse.map((user) => {
         return {
@@ -270,9 +288,8 @@ function Users() {
                 <Card.Text>Parking: </Card.Text>
                 <Card.Text>Ubicacion: </Card.Text>
               </Card.Body>
-            </Card>       
+            </Card>      
             )})}
-
 
           </Modal.Body>
         </Modal>
