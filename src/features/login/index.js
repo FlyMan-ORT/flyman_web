@@ -14,7 +14,7 @@ export const postLogin = createAsyncThunk('auth/login', async (params) => {
   return response;
 });
 
-export const logout = createAction('auth/logout', console.log('acá'));
+export const logout = createAction('auth/logout');
 
 const loginSlice = createSlice({
   name: 'login',

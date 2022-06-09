@@ -6,9 +6,7 @@ import { getSuccessfulLogin } from '../selectors/login';
 
 function MainContainer() {
 
-  const existsToken = useSelector((state) => getSuccessfulLogin(state));
-
-  console.log(existsToken === null);
+  const existsToken = useSelector((state) => getSuccessfulLogin(state));  
 
   const isAuthenticated = () => existsToken !== null;
   
