@@ -9,6 +9,8 @@ import Form from 'react-bootstrap/Form';
 import ButtonBootstrap from 'react-bootstrap/Button'
 import { getMaintenanceUsers } from '../api/users';
 import { dateToString } from '../utils/dateParsers';
+import moment from 'moment';
+import Card from 'react-bootstrap/Card'
 
 const divContainerStyle = {
   height: 800,
@@ -36,17 +38,8 @@ function Home() {
   const [sourceForMap, setSourceForMap] = useState('')
   const [createReserveModalShow, setCreateReserveModalShow] = useState(false)
   const [maintenanceUsers, setMaintenanceUsers] = useState([])
-
-  const [reservationSelectedDay, setDiaReserva] = useState(dateToString(new Date()))
-  console.log("reservationSelectedDay: " + reservationSelectedDay)
-  const [reservationSelectedTime, setHoraReserva] = useState("08:00")
-  console.log("reservationSelectedTime: " + reservationSelectedTime)
-  const [reservationSelectedEmployee, setMailDeOperario] = useState("")
-  console.log("reservationSelectedEmployee: " + reservationSelectedEmployee)
-  const [carForReservation, setCarForReservation] = useState({})
-
-  const [reservationSelectedDay, setDiaReserva] = useState(dateToString(new Date()))  
-  const [reservationSelectedTime, setHoraReserva] = useState("08:00")  
+  const [reservationSelectedDay, setDiaReserva] = useState(moment().format('YYYY-MM-DD'))  
+  const [reservationSelectedTime, setHoraReserva] = useState(moment().startOf('hour').format('hh:mm'))  
   const [reservationSelectedEmployee, setMailDeOperario] = useState("")  
   const [carForReservation, setCarForReservation] = useState({})  
 
@@ -189,9 +182,14 @@ function Home() {
         </Modal.Header>
         <Modal.Body>{selectedCarReservations.map(e => {
           return (
-            <div>
-              <p>Inicio: {new Date(e.startTime).getHours()}:{new Date(e.startTime).getMinutes()} - Fin {new Date(e.endTime).getHours()}:{new Date(e.endTime).getMinutes()}</p>
-            </div>
+          <Card border="primary" style={{marginBottom:10}}>
+            <Card.Header style={{alignItems:'center'}}>
+              <b>{moment(e.startTime).format('hh:mm A')} - {moment(e.endTime).format('hh:mm A')}</b>
+            </Card.Header>
+            <Card.Body>              
+              <Card.Text>{e.user.email}</Card.Text>
+            </Card.Body>
+          </Card>
           )
         })}
         </Modal.Body>
@@ -224,8 +222,8 @@ function Home() {
               <Form.Label>Elegir horario</Form.Label>
               <Form.Control
                 type="time"
-                defaultValue="08:00"
-                onChange={e => { setHoraReserva(e.target.value) }}
+                defaultValue={reservationSelectedTime}
+                onChange={e => { setHoraReserva(e.target.value)}}
                 autoFocus
               />
               <Form.Label>Elegir operario</Form.Label>
@@ -241,21 +239,16 @@ function Home() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <ButtonBootstrap variant="secondary" onClick={() => {
-            setCreateReserveModalShow(false)
-            setDiaReserva(dateToString(new Date()))
-            setHoraReserva("08:00")
-            setMailDeOperario("")
-          }
-          }>Cerrar
+          <ButtonBootstrap variant="secondary" onClick={() => { 
+            setCreateReserveModalShow(false)          
+            setMailDeOperario("") 
+            }
+            }>Cerrar
           </ButtonBootstrap>
           <ButtonBootstrap variant="primary" onClick={() => {
             createReservation(carForReservation, reservationSelectedEmployee, reservationSelectedDay, reservationSelectedTime)
             setCreateReserveModalShow(false)
-            setDiaReserva(dateToString(new Date()))
-            setHoraReserva("08:00")
-            setMailDeOperario("")
-          }
+            }
           }>Asignar reserva
           </ButtonBootstrap>
         </Modal.Footer>
