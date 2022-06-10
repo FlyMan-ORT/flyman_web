@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
+import Box from '@mui/material/Box';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -29,19 +30,19 @@ const mapModalStyle = {
 
 function Home() {
   const [cars, setCars] = useState([]);
-  const [reservations, setReservations] = useState([]);  
-  const [carsWithReservationFirst, setCarsWithReservationFirst] = useState([]);  
-  const [selectedCarReservations, setSelectedCarReservations] = useState([])  
+  const [reservations, setReservations] = useState([]);
+  const [carsWithReservationFirst, setCarsWithReservationFirst] = useState([]);
+  const [selectedCarReservations, setSelectedCarReservations] = useState([])
   const [reservationsModalShow, setReservationsModalShow] = useState(false)
   const [mapViewModalShow, setMapViewModalShow] = useState(false)
   const [carForMapView, setCarForMapView] = useState({ position: { latitude: 0, longitude: 0 } })
   const [sourceForMap, setSourceForMap] = useState('')
   const [createReserveModalShow, setCreateReserveModalShow] = useState(false)
   const [maintenanceUsers, setMaintenanceUsers] = useState([])
-  const [reservationSelectedDay, setDiaReserva] = useState(moment().format('YYYY-MM-DD'))  
-  const [reservationSelectedTime, setHoraReserva] = useState(moment().startOf('hour').format('hh:mm'))  
-  const [reservationSelectedEmployee, setMailDeOperario] = useState("")  
-  const [carForReservation, setCarForReservation] = useState({})  
+  const [reservationSelectedDay, setDiaReserva] = useState(moment().format('YYYY-MM-DD'))
+  const [reservationSelectedTime, setHoraReserva] = useState(moment().startOf('hour').format('hh:mm'))
+  const [reservationSelectedEmployee, setMailDeOperario] = useState("")
+  const [carForReservation, setCarForReservation] = useState({})
 
   const handleCloseReservationModal = () => setReservationsModalShow(false);
   const handleCloseMapViewModal = () => setMapViewModalShow(false);
@@ -94,7 +95,7 @@ function Home() {
     filteredCars.push(...restOfcars)
 
     //lo mapeo para la tabla
-    const carsForTable = filteredCars.map((car) => {      
+    const carsForTable = filteredCars.map((car) => {
       return {
         id: car._id,
         plate: car.plate,
@@ -103,8 +104,9 @@ function Home() {
         fuelType: car.fuelType,
         parkingName: car.parkingName,
         idParkingSlot: car.idParkingSlot,
-        lastModifiedDate: car.lastModifiedDate,        
-        position: car.position ? { latitude: car.position.latitude, longitude: car.position.longitude } : { latitude: 0, longitude: 0 }
+        lastModifiedDate: car.lastModifiedDate,
+        position: car.position ? { latitude: car.position.latitude, longitude: car.position.longitude } : { latitude: 0, longitude: 0 },
+        battery: car.battery
       }
     })
     setCarsWithReservationFirst(carsForTable);
@@ -118,7 +120,7 @@ function Home() {
       getActions: (params) => [
         <GridActionsCellItem icon={<FormatListBulletedIcon fontSize='large' />}
           onClick={() => {
-            setSelectedCarReservations(reservations.filter(r => r.car.plate === params.row.plate))                
+            setSelectedCarReservations(reservations.filter(r => r.car.plate === params.row.plate))
             setReservationsModalShow(true)
           }
           }
@@ -159,8 +161,29 @@ function Home() {
       sortable: false,
       valueGetter: (params) => `${params.row.plate}`,
     },
-    { field: 'description', headerName: 'Modelo', width: 300 },
-    { field: 'fuelLevel', headerName: 'Combustible', width: 130 },
+    {
+      field: 'fuelLevel',
+      headerName: 'Combustible',
+      width: 130,
+      align: 'center',
+      cellClassName: (params) => {
+        if (params.row.fuelLevel < 25) return 'red';
+        if (params.row.fuelLevel < 50 && params.row.fuelLevel >= 25) return 'orange';
+        if (params.row.fuelLevel < 75 && params.row.fuelLevel >= 50) return 'yellow';
+        if (params.row.fuelLevel <= 100 && params.row.fuelLevel >= 75) return 'green';
+      }
+    },
+    {
+      field: 'battery',
+      headerName: 'Batería',
+      width: 130,
+      align: 'center',
+      cellClassName: (params) => {
+        if (params.row.battery < 11) return 'red';
+        if (params.row.battery < 12 && params.row.battery >= 11) return 'orange';
+      }
+    },
+    { field: 'description', headerName: 'Modelo', width: 130 },
     { field: 'fuelType', headerName: 'Tipo de combustible', width: 130 },
     { field: 'parkingName', headerName: 'Estacionamiento', width: 300 },
     { field: 'idParkingSlot', headerName: 'Ubicacion', width: 130 },
@@ -170,26 +193,53 @@ function Home() {
 
   return (
     <div style={divContainerStyle}>
-      <DataGrid
-        rows={carsWithReservationFirst}
-        columns={columns}
-        pageSize={10}
-        rowsPerPageOptions={[5]}
-      />
+      <Box
+        sx={{
+          height: 3000,
+          width: 2000,
+          '& .green': {
+            backgroundColor: '#66ff99',
+            color: '#1a3e72',
+            fontWeight: '600',
+          },
+          '& .red': {
+            backgroundColor: '#ff4d4d',
+            color: '#1a3e72',
+            fontWeight: '600',
+          },
+          '& .orange': {
+            backgroundColor: '#ffc266',
+            color: '#1a3e72',
+            fontWeight: '600',
+          },
+          '& .yellow': {
+            backgroundColor: '#ffff80',
+            color: '#1a3e72',
+            fontWeight: '600',
+          },
+        }}
+      >
+        <DataGrid
+          rows={carsWithReservationFirst}
+          columns={columns}
+          pageSize={10}
+          rowsPerPageOptions={[5]}
+        />
+      </Box>
       <Modal show={reservationsModalShow} onHide={handleCloseReservationModal} size="sm">
         <Modal.Header closeButton>
           <Modal.Title>Reservas del dia</Modal.Title>
         </Modal.Header>
         <Modal.Body>{selectedCarReservations.map(e => {
           return (
-          <Card border="primary" style={{marginBottom:10}}>
-            <Card.Header style={{alignItems:'center'}}>
-              <b>{moment(e.startTime).format('hh:mm A')} - {moment(e.endTime).format('hh:mm A')}</b>
-            </Card.Header>
-            <Card.Body>              
-              <Card.Text>{e.user.email}</Card.Text>
-            </Card.Body>
-          </Card>
+            <Card border="primary" style={{ marginBottom: 10 }}>
+              <Card.Header style={{ alignItems: 'center' }}>
+                <b>{moment(e.startTime).format('hh:mm A')} - {moment(e.endTime).format('hh:mm A')}</b>
+              </Card.Header>
+              <Card.Body>
+                <Card.Text>{e.user.email}</Card.Text>
+              </Card.Body>
+            </Card>
           )
         })}
         </Modal.Body>
@@ -223,7 +273,7 @@ function Home() {
               <Form.Control
                 type="time"
                 defaultValue={reservationSelectedTime}
-                onChange={e => { setHoraReserva(e.target.value)}}
+                onChange={e => { setHoraReserva(e.target.value) }}
                 autoFocus
               />
               <Form.Label>Elegir operario</Form.Label>
@@ -239,16 +289,16 @@ function Home() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <ButtonBootstrap variant="secondary" onClick={() => { 
-            setCreateReserveModalShow(false)          
-            setMailDeOperario("") 
-            }
-            }>Cerrar
+          <ButtonBootstrap variant="secondary" onClick={() => {
+            setCreateReserveModalShow(false)
+            setMailDeOperario("")
+          }
+          }>Cerrar
           </ButtonBootstrap>
           <ButtonBootstrap variant="primary" onClick={() => {
             createReservation(carForReservation, reservationSelectedEmployee, reservationSelectedDay, reservationSelectedTime)
             setCreateReserveModalShow(false)
-            }
+          }
           }>Asignar reserva
           </ButtonBootstrap>
         </Modal.Footer>
