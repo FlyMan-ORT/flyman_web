@@ -1,9 +1,8 @@
 import axios from 'axios';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
@@ -12,6 +11,8 @@ import { getMaintenanceUsers } from '../api/users';
 import { dateToString } from '../utils/dateParsers';
 import moment from 'moment';
 import Card from 'react-bootstrap/Card'
+import Badge from 'react-bootstrap/Badge'
+import {datesAscending} from '../utils/sorting'
 
 const divContainerStyle = {
   height: 800,
@@ -106,7 +107,9 @@ function Home() {
         idParkingSlot: car.idParkingSlot,
         lastModifiedDate: car.lastModifiedDate,
         position: car.position ? { latitude: car.position.latitude, longitude: car.position.longitude } : { latitude: 0, longitude: 0 },
-        battery: car.battery
+        battery: car.battery,
+        nextReservation: 'nextReservation'
+
       }
     })
     setCarsWithReservationFirst(carsForTable);
@@ -115,17 +118,34 @@ function Home() {
   const columns = [
     {
       headerName: 'Reservas',
-      field: 'reservations',
-      type: 'actions',
-      getActions: (params) => [
-        <GridActionsCellItem icon={<FormatListBulletedIcon fontSize='large' />}
-          onClick={() => {
-            setSelectedCarReservations(reservations.filter(r => r.car.plate === params.row.plate))
+      renderCell: (params) => {
+        const dayReservations = reservations.filter(r => r.car.plate == params.row.plate).filter(r => (moment().isSame(moment(r.startTime), 'day')))
+        return (
+          <ButtonBootstrap variant="outline-secondary" onClick={() => {
+            setSelectedCarReservations(reservations.filter(r => r.car.plate === params.row.plate)
+                                                  .sort(datesAscending))
             setReservationsModalShow(true)
-          }
-          }
-          label="Delete" />
-      ]
+          }}>
+            Ver <Badge bg="dark">{dayReservations.length}</Badge>
+            <span className="visually-hidden"></span>
+          </ButtonBootstrap>
+        )
+      }
+    },
+    {
+      headerName: 'Proxima',
+      field: 'nextReservation',
+      renderCell: (params) => {
+        const nextReservation = reservations.filter(r => r.car.plate == params.row.plate)
+          .filter(r => moment().isSame(moment(r.startTime), 'day'))
+          .filter(r => moment(r.startTime).isAfter(moment(), 'hour'))
+          .sort(datesAscending)
+        console.log(nextReservation[0])
+
+        return (
+          <p>{nextReservation.length > 0 ? moment(nextReservation[0].startTime).format('hh:mm A') : '-'}</p>
+        )
+      }
     },
     {
       headerName: 'Asignar',
@@ -231,16 +251,18 @@ function Home() {
           <Modal.Title>Reservas del dia</Modal.Title>
         </Modal.Header>
         <Modal.Body>{selectedCarReservations.map(e => {
-          return (
-            <Card border="primary" style={{ marginBottom: 10 }}>
-              <Card.Header style={{ alignItems: 'center' }}>
-                <b>{moment(e.startTime).format('hh:mm A')} - {moment(e.endTime).format('hh:mm A')}</b>
-              </Card.Header>
-              <Card.Body>
-                <Card.Text>{e.user.email}</Card.Text>
-              </Card.Body>
-            </Card>
-          )
+          if (moment().isSame(moment(e.startTime), 'day')) {
+            return (
+              <Card border="primary" style={{ marginBottom: 10 }}>
+                <Card.Header style={{ alignItems: 'center' }}>
+                  <b>{moment(e.startTime).format('hh:mm A')} - {moment(e.endTime).format('hh:mm A')}</b>
+                </Card.Header>
+                <Card.Body>
+                  <Card.Text>{e.user.email}</Card.Text>
+                </Card.Body>
+              </Card>
+            )
+          }
         })}
         </Modal.Body>
       </Modal>

@@ -11,6 +11,7 @@ import ButtonBootstrap from 'react-bootstrap/Button'
 import { BASE_URL } from '../utils/connections';
 import moment from 'moment';
 import Card from 'react-bootstrap/Card'
+import { datesAscending } from '../utils/sorting'
 
 const divContainerStyle = {
   height: 800,
@@ -84,7 +85,7 @@ function Users() {
               r.user.email === params.row.email &&
               r.bookingType === 'MAINTENANCE' &&
               moment(r.startTime).isSame(moment(), 'day')
-            ))
+            ).sort(datesAscending))
             setAssigmentsModalShow(true);
           }} label="Assigment" />
       ]
@@ -118,12 +119,6 @@ function Users() {
     async function fetchData() {
       const usersResponse = (await axios.get(`${process.env.REACT_APP_BASE_URL}/users/`)).data;
       const reserves = (await axios.get(`${process.env.REACT_APP_BASE_URL}/reservations/`)).data;
-
-
-      console.log(reserves[0].id)
-      console.log('day', new Date(reserves[0].startTime).getDate())
-      console.log('mes', new Date(reserves[0].startTime).getMonth())
-      console.log('anmio', new Date(reserves[0].startTime).getFullYear())
 
       const usersForTable = usersResponse.map((user) => {
         return {
@@ -277,19 +272,20 @@ function Users() {
           <Modal.Header closeButton>
             <Modal.Title>Asignaciones</Modal.Title>
           </Modal.Header>
-          <Modal.Body>{reservesByUser.map((r) => { 
-            return (             
-            <Card border="primary" style={{ marginBottom: 10 }}>
-              <Card.Header style={{ alignItems: 'center' }}>
-                <b>{moment(r.startTime).format('hh:mm A')} : {moment(r.endTime).format('hh:mm A')}</b>
+          <Modal.Body>{reservesByUser.map((r) => {
+            return (
+              <Card border="primary" style={{ marginBottom: 10 }}>
+                <Card.Header style={{ alignItems: 'center' }}>
+                  <b>{moment(r.startTime).format('hh:mm A')} : {moment(r.endTime).format('hh:mm A')}</b>
                 </Card.Header>
-              <Card.Body>
-                <Card.Text>Patente: {r.car.plate}</Card.Text>
-                <Card.Text>Parking: </Card.Text>
-                <Card.Text>Ubicacion: </Card.Text>
-              </Card.Body>
-            </Card>      
-            )})}
+                <Card.Body>
+                  <Card.Text>Patente: {r.car.plate}</Card.Text>
+                  <Card.Text>Parking: </Card.Text>
+                  <Card.Text>Ubicacion: </Card.Text>
+                </Card.Body>
+              </Card>
+            )
+          })}
 
           </Modal.Body>
         </Modal>
