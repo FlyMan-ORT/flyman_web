@@ -50,6 +50,7 @@ function Home() {
   const [openSnackError, setOpenSnackError] = useState(false);
   const [openSnackSuccess, setOpenSnackSuccess] = useState(false);
   const [snackMessage, setSnackMessage] = useState('');
+  const [updateFlag, setUpdateFlag] = useState(false);
   const handleCloseReservationModal = () => setReservationsModalShow(false);
   const handleCloseMapViewModal = () => setMapViewModalShow(false);
   const handleCloseCreateReserveModal = () => setCreateReserveModalShow(false);
@@ -61,20 +62,6 @@ function Home() {
   const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });  
-
-  async function createReservation(car, employeeMail, reservationDay, reservationTime) {
-    try {
-      const reservation = { car, employeeMail, reservationDay, reservationTime };
-      await axios.post(`${process.env.REACT_APP_BASE_URL}/reservations/`, reservation);
-      setCreateReserveModalShow(false);
-      setSnackMessage('Reserva creada!');
-      setOpenSnackSuccess(true);
-    } catch (error) {
-      setSnackMessage(error.response.data.error);
-      setOpenSnackError(true);
-      console.log(error.response.data.error);
-    }
-  };  
 
   useEffect(() => {
     async function fetchData() {
@@ -88,14 +75,26 @@ function Home() {
       const fetchMaintenanceUsers = await getMaintenanceUsers();
       const valuesMaintananceUser = fetchMaintenanceUsers.map((m) => { return { value: m.email, label: m.name } })
       setMaintenanceUsers(valuesMaintananceUser)
-
-
     }
     fetchData();
-  }, [])
+  }, [updateFlag])
+
+  async function createReservation(car, employeeMail, reservationDay, reservationTime) {
+    try {
+      const reservation = { car, employeeMail, reservationDay, reservationTime };
+      await axios.post(`${process.env.REACT_APP_BASE_URL}/reservations/`, reservation);
+      setCreateReserveModalShow(false);
+      setSnackMessage('Reserva creada!');
+      setOpenSnackSuccess(true);
+      setUpdateFlag(!updateFlag)
+    } catch (error) {
+      setSnackMessage(error.response.data.error);
+      setOpenSnackError(true);
+      console.log(error.response.data.error);
+    }
+  };  
 
   useEffect(() => {
-
     setSourceForMap('<iframe width = "800" height = "650" style = "border:0" loading = "lazy" allowfullscreen referrerpolicy = "no-referrer-when-downgrade" src = "https://maps.google.com/maps?q=' + carForMapView.position.latitude + ',' + carForMapView.position.longitude + '&hl=es&z=14&amp;output=embed"></iframe >')
   }, [mapViewModalShow])
 
@@ -324,6 +323,7 @@ function Home() {
                 aria-label="Default select example"
                 onChange={e => { setMailDeOperario(e.target.value) }}
               >
+                <option value="">Seleccionar usuario</option>
                 {maintenanceUsers.map((m) => (
                   <option value={m.value}>{m.label}</option>
                 ))}
