@@ -108,7 +108,7 @@ function Home() {
         lastModifiedDate: car.lastModifiedDate,
         position: car.position ? { latitude: car.position.latitude, longitude: car.position.longitude } : { latitude: 0, longitude: 0 },
         battery: car.battery,
-        fruta: 'a'
+        nextReservation: 'nextReservation'
 
       }
     })
@@ -134,7 +134,7 @@ function Home() {
     },
     {
       headerName: 'Proxima',
-      field: 'fruta',
+      field: 'nextReservation',
       renderCell: (params) => {
         const nextReservation = reservations.filter(r => r.car.plate == params.row.plate)
           .filter(r => moment().isSame(moment(r.startTime), 'day'))
