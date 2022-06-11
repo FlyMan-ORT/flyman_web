@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, forwardRef } from 'react';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
@@ -12,7 +12,10 @@ import { dateToString } from '../utils/dateParsers';
 import moment from 'moment';
 import Card from 'react-bootstrap/Card'
 import Badge from 'react-bootstrap/Badge'
-import {datesAscending} from '../utils/sorting'
+import { datesAscending } from '../utils/sorting'
+import { Snackbar } from '@mui/material';
+import MuiAlert from '@mui/material/Alert';
+import { SnackBarFlyMan } from '../components/snackbar/snackBar';
 
 const divContainerStyle = {
   height: 800,
@@ -44,16 +47,34 @@ function Home() {
   const [reservationSelectedTime, setHoraReserva] = useState(moment().startOf('hour').format('hh:mm'))
   const [reservationSelectedEmployee, setMailDeOperario] = useState("")
   const [carForReservation, setCarForReservation] = useState({})
-
+  const [openSnackError, setOpenSnackError] = useState(false);
+  const [openSnackSuccess, setOpenSnackSuccess] = useState(false);
+  const [snackMessage, setSnackMessage] = useState('');
   const handleCloseReservationModal = () => setReservationsModalShow(false);
   const handleCloseMapViewModal = () => setMapViewModalShow(false);
   const handleCloseCreateReserveModal = () => setCreateReserveModalShow(false);
+  const handleClick = () =>  {
+    setOpenSnackError(false);
+    setOpenSnackSuccess(false)
+  };
+
+  const Alert = forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });  
 
   async function createReservation(car, employeeMail, reservationDay, reservationTime) {
-    const reservation = { car, employeeMail, reservationDay, reservationTime }
-    await axios.post(`${process.env.REACT_APP_BASE_URL}/reservations/`, reservation)
-
-  }
+    try {
+      const reservation = { car, employeeMail, reservationDay, reservationTime };
+      await axios.post(`${process.env.REACT_APP_BASE_URL}/reservations/`, reservation);
+      setCreateReserveModalShow(false);
+      setSnackMessage('Reserva creada!');
+      setOpenSnackSuccess(true);
+    } catch (error) {
+      setSnackMessage(error.response.data.error);
+      setOpenSnackError(true);
+      console.log(error.response.data.error);
+    }
+  };  
 
   useEffect(() => {
     async function fetchData() {
@@ -123,7 +144,7 @@ function Home() {
         return (
           <ButtonBootstrap variant="outline-secondary" onClick={() => {
             setSelectedCarReservations(reservations.filter(r => r.car.plate === params.row.plate)
-                                                  .sort(datesAscending))
+              .sort(datesAscending))
             setReservationsModalShow(true)
           }}>
             Ver <Badge bg="dark">{dayReservations.length}</Badge>
@@ -319,12 +340,23 @@ function Home() {
           </ButtonBootstrap>
           <ButtonBootstrap variant="primary" onClick={() => {
             createReservation(carForReservation, reservationSelectedEmployee, reservationSelectedDay, reservationSelectedTime)
-            setCreateReserveModalShow(false)
+
           }
           }>Asignar reserva
           </ButtonBootstrap>
         </Modal.Footer>
       </Modal>
+      <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center'}} open={openSnackError} autoHideDuration={6000} onClose={handleClick}>
+        <Alert onClose={handleClick} severity="error" sx={{ width: '100%' }}>
+        {snackMessage}  
+        </Alert>
+      </Snackbar>
+      <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center'}} open={openSnackSuccess} autoHideDuration={6000} onClose={handleClick}>
+        <Alert onClose={handleClick} severity="success" sx={{ width: '100%' }}>
+        {snackMessage}  
+        </Alert>
+      </Snackbar>
+      {/* <SnackBarFlyMan severity={'error'} message={snackMessage} open={openSnackError} handleClick={handleClick} /> */}
     </div>
   );
 }
