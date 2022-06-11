@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import Button from '@mui/material/Button';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
-import { login } from '../api/users';
 import { postLogin } from '../features/login';
 import { isFailedLogin } from '../selectors/login';
 
@@ -67,7 +66,5 @@ function Login() {
         </div>
     );
 }
-
-const openAlert = () => alert('Ups!', 'Ocurrio un error al hacer login.', [{ text: 'OK', style: 'cancel' }]);
 
 export default Login;

@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useEffect, useState, forwardRef } from 'react';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
@@ -8,6 +7,8 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import ButtonBootstrap from 'react-bootstrap/Button'
 import { getMaintenanceUsers } from '../api/users';
+import { getAllReservations, createReserve } from '../api/reservations';
+import { getAllCars } from '../api/cars';
 import { dateToString } from '../utils/dateParsers';
 import moment from 'moment';
 import Card from 'react-bootstrap/Card'
@@ -54,27 +55,29 @@ function Home() {
   const handleCloseReservationModal = () => setReservationsModalShow(false);
   const handleCloseMapViewModal = () => setMapViewModalShow(false);
   const handleCloseCreateReserveModal = () => setCreateReserveModalShow(false);
-  const handleClick = () =>  {
+  const handleClick = () => {
     setOpenSnackError(false);
     setOpenSnackSuccess(false)
   };
 
   const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-  });  
+  });
 
   useEffect(() => {
     async function fetchData() {
-
-      const carsResponse = await axios.get(`${process.env.REACT_APP_BASE_URL}/cars/`);
-      setCars(carsResponse.data);
-
-      const reservantionResponse = await axios.get(`${process.env.REACT_APP_BASE_URL}/reservations/`);
-      setReservations(reservantionResponse.data)
-
-      const fetchMaintenanceUsers = await getMaintenanceUsers();
-      const valuesMaintananceUser = fetchMaintenanceUsers.map((m) => { return { value: m.email, label: m.name } })
-      setMaintenanceUsers(valuesMaintananceUser)
+      try {
+        const carsResponse = await getAllCars();
+        setCars(carsResponse);
+        const reservantionResponse = await getAllReservations();
+        setReservations(reservantionResponse)
+        const fetchMaintenanceUsers = await getMaintenanceUsers();
+        const valuesMaintananceUser = fetchMaintenanceUsers.map((m) => { return { value: m.email, label: m.name } })
+        setMaintenanceUsers(valuesMaintananceUser)
+      } catch (error) {
+        setSnackMessage(error.message);
+        setOpenSnackError(true);
+      }
     }
     fetchData();
   }, [updateFlag])
@@ -82,17 +85,17 @@ function Home() {
   async function createReservation(car, employeeMail, reservationDay, reservationTime) {
     try {
       const reservation = { car, employeeMail, reservationDay, reservationTime };
-      await axios.post(`${process.env.REACT_APP_BASE_URL}/reservations/`, reservation);
+      await createReserve(reservation);
       setCreateReserveModalShow(false);
       setSnackMessage('Reserva creada!');
       setOpenSnackSuccess(true);
       setUpdateFlag(!updateFlag)
+      setMailDeOperario("")
     } catch (error) {
-      setSnackMessage(error.response.data.error);
+      setSnackMessage(error.message);
       setOpenSnackError(true);
-      console.log(error.response.data.error);
     }
-  };  
+  };
 
   useEffect(() => {
     setSourceForMap('<iframe width = "800" height = "650" style = "border:0" loading = "lazy" allowfullscreen referrerpolicy = "no-referrer-when-downgrade" src = "https://maps.google.com/maps?q=' + carForMapView.position.latitude + ',' + carForMapView.position.longitude + '&hl=es&z=14&amp;output=embed"></iframe >')
@@ -273,7 +276,8 @@ function Home() {
         <Modal.Body>{selectedCarReservations.map(e => {
           if (moment().isSame(moment(e.startTime), 'day')) {
             return (
-              <Card border="primary" style={{ marginBottom: 10 }}>
+              <Card border={(moment(e.startTime).isAfter(moment(), 'hour')) ? "success" : "danger"}
+                style={{ marginBottom: 10 }}>
                 <Card.Header style={{ alignItems: 'center' }}>
                   <b>{moment(e.startTime).format('hh:mm A')} - {moment(e.endTime).format('hh:mm A')}</b>
                 </Card.Header>
@@ -301,6 +305,7 @@ function Home() {
           <Modal.Title>Asignar reserva a operario</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          <h6>Auto: {carForReservation.plate}</h6>
           <Form>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Form.Label>Elegir dia</Form.Label>
@@ -323,7 +328,7 @@ function Home() {
                 aria-label="Default select example"
                 onChange={e => { setMailDeOperario(e.target.value) }}
               >
-                <option value="">Seleccionar usuario</option>
+                <option value="">Seleccionar operario</option>
                 {maintenanceUsers.map((m) => (
                   <option value={m.value}>{m.label}</option>
                 ))}
@@ -340,20 +345,19 @@ function Home() {
           </ButtonBootstrap>
           <ButtonBootstrap variant="primary" onClick={() => {
             createReservation(carForReservation, reservationSelectedEmployee, reservationSelectedDay, reservationSelectedTime)
-
           }
           }>Asignar reserva
           </ButtonBootstrap>
         </Modal.Footer>
       </Modal>
-      <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center'}} open={openSnackError} autoHideDuration={6000} onClose={handleClick}>
+      <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={openSnackError} autoHideDuration={6000} onClose={handleClick}>
         <Alert onClose={handleClick} severity="error" sx={{ width: '100%' }}>
-        {snackMessage}  
+          {snackMessage}
         </Alert>
       </Snackbar>
-      <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center'}} open={openSnackSuccess} autoHideDuration={6000} onClose={handleClick}>
+      <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={openSnackSuccess} autoHideDuration={6000} onClose={handleClick}>
         <Alert onClose={handleClick} severity="success" sx={{ width: '100%' }}>
-        {snackMessage}  
+          {snackMessage}
         </Alert>
       </Snackbar>
       {/* <SnackBarFlyMan severity={'error'} message={snackMessage} open={openSnackError} handleClick={handleClick} /> */}
