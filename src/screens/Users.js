@@ -61,6 +61,25 @@ function Users() {
     setUpdateFlag(!updateFlag)
   }
 
+  useEffect(() => {
+    async function fetchData() {
+      const usersResponse = (await axios.get(`${process.env.REACT_APP_BASE_URL}/users/`)).data;
+      const reserves = (await axios.get(`${process.env.REACT_APP_BASE_URL}/reservations/`)).data;
+
+      const usersForTable = usersResponse.map((user) => {
+        return {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone
+        }
+      })
+      setUsers(usersForTable);
+      setReserves(reserves)
+    }
+    fetchData();
+  }, [updateFlag])
+
   const columns = [
     { field: 'id', headerName: 'ID', width: 70, hide: true },
     { field: 'name', headerName: 'Nombre', width: 300 },
@@ -115,24 +134,7 @@ function Users() {
     },
   ];
 
-  useEffect(() => {
-    async function fetchData() {
-      const usersResponse = (await axios.get(`${process.env.REACT_APP_BASE_URL}/users/`)).data;
-      const reserves = (await axios.get(`${process.env.REACT_APP_BASE_URL}/reservations/`)).data;
 
-      const usersForTable = usersResponse.map((user) => {
-        return {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          phone: user.phone
-        }
-      })
-      setUsers(usersForTable);
-      setReserves(reserves)
-    }
-    fetchData();
-  }, [updateFlag])
 
   return (
     <div style={divContainerStyle}>
