@@ -3,6 +3,7 @@ import axios from 'axios';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import LocalCarWashIcon from '@mui/icons-material/LocalCarWash';
 import Modal from 'react-bootstrap/Modal';
+import { getAllServices } from '../api/services';
 
 const divContainerStyle = {
   height: 800,
@@ -54,24 +55,24 @@ function Historic() {
 
   useEffect(() => {
     async function fetchData() {
-      // TODO: sacar URL hardcodeada.
-      const servicesResponse = (await axios.get(`${process.env.REACT_APP_BASE_URL}/services/`)).data;
-
-      const servicesForTable = servicesResponse.map((service) => {
-        return {
-          id: service._id,
-          plate: service.plate,
-          reservationId: service.reservationId,
-          userEmail: service.userEmail,
-          startDate: (new Date(service.startDate)).toLocaleString('en-GB', { timeZone: 'UTC' }),
-          endDate: (service.endDate ? (new Date(service.endDate)).toLocaleString('en-GB', { timeZone: 'UTC' }) : ""),
-          tasks: (service.tasks) ? service.tasks : []
-        }
-      })
-      setServices(servicesForTable);
+      try {
+        const servicesResponse = await getAllServices();
+        const servicesForTable = servicesResponse.map((service) => {
+          return {
+            id: service._id,
+            plate: service.plate,
+            reservationId: service.reservationId,
+            userEmail: service.userEmail,
+            startDate: (new Date(service.startDate)).toLocaleString('en-GB', { timeZone: 'UTC' }),
+            endDate: (service.endDate ? (new Date(service.endDate)).toLocaleString('en-GB', { timeZone: 'UTC' }) : ""),
+            tasks: (service.tasks) ? service.tasks : []
+          }
+        })
+        setServices(servicesForTable);
+      } catch (error) { 
+      }
     }
     fetchData();
-
   }, [])
 
   return (

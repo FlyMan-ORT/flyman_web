@@ -1,17 +1,19 @@
 import React from 'react';
-import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, forwardRef } from 'react';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Modal from 'react-bootstrap/Modal';
-import AssignmentIcon from '@mui/icons-material/Assignment';
 import Form from 'react-bootstrap/Form';
 import ButtonBootstrap from 'react-bootstrap/Button'
-import { BASE_URL } from '../utils/connections';
 import moment from 'moment';
 import Card from 'react-bootstrap/Card'
 import { datesAscending } from '../utils/sorting'
+import Badge from 'react-bootstrap/Badge'
+import { getMaintenanceUsers, createNewUser, updateOneUser, deleteOneUser } from '../api/users';
+import { getAllReservations } from '../api/reservations';
+import { Snackbar } from '@mui/material';
+import MuiAlert from '@mui/material/Alert';
 
 const divContainerStyle = {
   height: 800,
@@ -33,72 +35,93 @@ function Users() {
   const [newUser, setNewUser] = useState({ name: '', email: '', phone: '', password: '' });
   const [assigmentsModalShow, setAssigmentsModalShow] = useState(false);
   const [reservesByUser, setReservesByUser] = useState([]);
+  const [openSnackError, setOpenSnackError] = useState(false);
+  const [openSnackSuccess, setOpenSnackSuccess] = useState(false);
+  const [snackMessage, setSnackMessage] = useState('');
+  const handleClick = () => {
+    setOpenSnackError(false);
+    setOpenSnackSuccess(false)
+  };
+
+  const Alert = forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
 
   async function createUser(user) {
-
-    const createUserResponse = (await axios.post(`${process.env.REACT_APP_BASE_URL}/users/register`, user)).data;
-
-    await axios.post(`${BASE_URL}/users/register`, user).data;
-
-    setUpdateFlag(!updateFlag)
+    try {
+      await createNewUser(user);
+      setNewUserModalShow(false);
+      setSnackMessage('Usuario creado correctamente.');
+      setOpenSnackSuccess(true);
+      setUpdateFlag(!updateFlag)
+    } catch (error) {
+      console.log(error)
+      setSnackMessage(error.message);
+      setOpenSnackError(true);
+    }
   }
 
   async function updateUser(userId) {
-
-    const updateUserResponse = (await axios.patch(`${process.env.REACT_APP_BASE_URL}/users/${userId}`, userForEditOrDeletion)).data;
-
-    await axios.patch(`${BASE_URL}/users/${userId}`, userForEditOrDeletion).data;
-
-    setUpdateFlag(!updateFlag)
+    try {
+      await updateOneUser(userId, userForEditOrDeletion);
+      setEditModalShow(false)
+      setSnackMessage('Usuario modificado correctamente.');
+      setOpenSnackSuccess(true);
+      setUpdateFlag(!updateFlag)
+    } catch (error) {
+      setSnackMessage(error.message);
+      setOpenSnackError(true);
+    }
   }
 
   async function deleteUser(userId) {
-
-    const deleteResponse = (await axios.delete(`${process.env.REACT_APP_BASE_URL}/users/${userId}`)).data;
-
-    await axios.delete(`${BASE_URL}/users/${userId}`).data;
-
-    setUpdateFlag(!updateFlag)
+    try {
+      await deleteOneUser(userId);
+      setDeleteModalShow(false)
+      setSnackMessage('Usuario borrado correctamente.');
+      setOpenSnackSuccess(true);
+      setUpdateFlag(!updateFlag)
+    } catch (error) {
+      setSnackMessage(error.message);
+      setOpenSnackError(true);
+    }
   }
 
   useEffect(() => {
     async function fetchData() {
-      const usersResponse = (await axios.get(`${process.env.REACT_APP_BASE_URL}/users/`)).data;
-      const reserves = (await axios.get(`${process.env.REACT_APP_BASE_URL}/reservations/`)).data;
-
-      const usersForTable = usersResponse.map((user) => {
-        return {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          phone: user.phone
-        }
-      })
-      setUsers(usersForTable);
-      setReserves(reserves)
+      try {
+        const usersResponse = await getMaintenanceUsers();
+        const reserves = await getAllReservations();
+        const usersForTable = usersResponse.map((user) => {
+          return {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            phone: user.phone
+          }
+        })
+        setUsers(usersForTable);
+        setReserves(reserves)
+      } catch (error) {
+        setSnackMessage(error.message);
+        setOpenSnackError(true);
+      }
     }
     fetchData();
   }, [updateFlag])
 
   const columns = [
     { field: 'id', headerName: 'ID', width: 70, hide: true },
-    { field: 'name', headerName: 'Nombre', width: 300 },
-    { field: 'phone', headerName: 'Telefono', width: 150 },
-    {
-      field: 'email', headerName: 'Email',
-      sortable: false,
-      width: 250,
-      valueGetter: (params) =>
-        `${params.row.email}`,
-    },
+    { field: 'name', headerName: 'Nombre', width: 150 },
     {
       headerName: 'Asignaciones',
       field: 'Asignaciones',
       type: 'actions',
       width: '120',
-      getActions: (params) => [
-        <GridActionsCellItem icon={<AssignmentIcon fontSize='large' />}
-          onClick={() => {
+      renderCell: (params) => {
+        const dayAsignations = reserves.filter(r => r.user.email == params.row.email).filter(r => (moment().isSame(moment(r.startTime), 'day')))
+        return (
+          <ButtonBootstrap variant="outline-secondary" onClick={() => {
             setUserForEditOrDeletion(params.row);
             setReservesByUser(reserves.filter((r) =>
               r.user.email === params.row.email &&
@@ -106,8 +129,20 @@ function Users() {
               moment(r.startTime).isSame(moment(), 'day')
             ).sort(datesAscending))
             setAssigmentsModalShow(true);
-          }} label="Assigment" />
-      ]
+          }}>
+            Ver <Badge bg="dark">{dayAsignations.length}</Badge>
+            <span className="visually-hidden"></span>
+          </ButtonBootstrap>
+        )
+      }
+    },
+    { field: 'phone', headerName: 'Telefono', width: 150 },
+    {
+      field: 'email', headerName: 'Email',
+      sortable: false,
+      width: 250,
+      valueGetter: (params) =>
+        `${params.row.email}`,
     },
     {
       headerName: 'Gestion',
@@ -134,8 +169,6 @@ function Users() {
     },
   ];
 
-
-
   return (
     <div style={divContainerStyle}>
       <ButtonBootstrap variant="light"
@@ -146,7 +179,7 @@ function Users() {
       <DataGrid
         rows={users}
         columns={columns}
-        pageSize={10}
+        pageSize={25}
         rowsPerPageOptions={[5]}
       />
       <div>
@@ -193,7 +226,6 @@ function Users() {
             </ButtonBootstrap>
             <ButtonBootstrap variant="primary" onClick={() => {
               updateUser(userForEditOrDeletion.id)
-              setEditModalShow(false)
             }
             }>
               Guardar cambios
@@ -205,15 +237,13 @@ function Users() {
           <Modal.Header closeButton>
             <Modal.Title>Eliminar usuario</Modal.Title>
           </Modal.Header>
-          <Modal.Body>Esta a punto de eliminar al usuario {userForEditOrDeletion.name}</Modal.Body>
+          <Modal.Body>¿Está seguro de querer borrar al usuario {userForEditOrDeletion.name}?</Modal.Body>
           <Modal.Footer>
             <ButtonBootstrap variant="secondary" onClick={() => setDeleteModalShow(false)}>
               Cancelar
             </ButtonBootstrap>
             <ButtonBootstrap variant="danger" onClick={() => {
               deleteUser(userForEditOrDeletion.id)
-              setDeleteModalShow(false)
-
             }
             }>
               Confirmar
@@ -261,7 +291,6 @@ function Users() {
             </ButtonBootstrap>
             <ButtonBootstrap variant="primary" onClick={() => {
               createUser(newUser)
-              setNewUserModalShow(false)
             }
             }>
               Guardar cambios
@@ -276,7 +305,7 @@ function Users() {
           </Modal.Header>
           <Modal.Body>{reservesByUser.map((r) => {
             return (
-              <Card border="primary" style={{ marginBottom: 10 }}>
+              <Card border={(moment(r.startTime).isAfter(moment(), 'hour')) ? "success" : "danger"} style={{ marginBottom: 10 }}>
                 <Card.Header style={{ alignItems: 'center' }}>
                   <b>{moment(r.startTime).format('hh:mm A')} : {moment(r.endTime).format('hh:mm A')}</b>
                 </Card.Header>
@@ -291,6 +320,16 @@ function Users() {
 
           </Modal.Body>
         </Modal>
+        <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={openSnackError} autoHideDuration={2000} onClose={handleClick}>
+          <Alert onClose={handleClick} severity="error" sx={{ width: '100%' }}>
+            {snackMessage}
+          </Alert>
+        </Snackbar>
+        <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={openSnackSuccess} autoHideDuration={2000} onClose={handleClick}>
+          <Alert onClose={handleClick} severity="success" sx={{ width: '100%' }}>
+            {snackMessage}
+          </Alert>
+        </Snackbar>
       </div>
 
 
