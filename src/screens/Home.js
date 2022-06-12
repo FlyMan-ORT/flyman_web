@@ -16,7 +16,7 @@ import Badge from 'react-bootstrap/Badge'
 import { datesAscending } from '../utils/sorting'
 import { Snackbar } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
-import { SnackBarFlyMan } from '../components/snackbar/snackBar';
+
 
 const divContainerStyle = {
   height: 800,
@@ -102,20 +102,27 @@ function Home() {
   }, [mapViewModalShow])
 
   useEffect(() => {
-    //separo los autos con reserva
-    let filteredCars = cars.filter((c) => {
-      return reservations.some((r) => {
-        return r.car.plate == c.plate;
-      });
-    });
+    //separo las reservas del dia y las ordeno
+    let filteredReservations = reservations.filter(r => (moment().isSame(moment(r.startTime), 'day'))).sort(datesAscending)
+
+    //creo el array donde iran los autos que sean de una reserva de hoy
+    let filteredCars = []
+
+    //filtro y por la primera reserva (la mas temprana del dia) agrego al auto al array
+
+    filteredReservations.forEach((r) => {
+      const car = cars.find(c => r.car.plate == c.plate)
+      if (car !== undefined && !filteredCars.some(c => c.plate == car.plate)) {
+        filteredCars.push(car)
+      }
+    })
 
     //separo el resto de los autos sacando los que tenian reserva
     let restOfcars = cars.filter((c) => {
       return !filteredCars.includes(c)
     })
 
-    //junto los dos array quedando los que tienen reserva al principio y agregando los otros detrás
-    //TODO: ordenar previamente los reservados por fecha más próxima
+    //integro los dos array quedando los que tienen reserva al principio y agregando los otros detrás    
     filteredCars.push(...restOfcars)
 
     //lo mapeo para la tabla
@@ -123,7 +130,7 @@ function Home() {
       return {
         id: car._id,
         plate: car.plate,
-        description: car.description,
+        description: car.name,
         fuelLevel: car.fuelLevel,
         fuelType: car.fuelType,
         parkingName: car.parkingName,
@@ -136,7 +143,8 @@ function Home() {
       }
     })
     setCarsWithReservationFirst(carsForTable);
-  }, [cars])
+
+  }, [cars, reservations])
 
   const columns = [
     {
@@ -163,7 +171,6 @@ function Home() {
           .filter(r => moment().isSame(moment(r.startTime), 'day'))
           .filter(r => moment(r.startTime).isAfter(moment(), 'hour'))
           .sort(datesAscending)
-        console.log(nextReservation[0])
 
         return (
           <p>{nextReservation.length > 0 ? moment(nextReservation[0].startTime).format('hh:mm A') : '-'}</p>
@@ -185,7 +192,7 @@ function Home() {
       ]
     },
     {
-      headerName: 'Ver en mapa',
+      headerName: 'Mapa',
       field: 'map',
       type: 'actions',
       getActions: (params) => [
@@ -227,9 +234,9 @@ function Home() {
       }
     },
     { field: 'description', headerName: 'Modelo', width: 130 },
-    { field: 'fuelType', headerName: 'Tipo de combustible', width: 130 },
-    { field: 'parkingName', headerName: 'Estacionamiento', width: 300 },
-    { field: 'idParkingSlot', headerName: 'Ubicacion', width: 130 },
+    { field: 'fuelType', headerName: 'Combustible', width: 130 },
+    { field: 'parkingName', headerName: 'Estacionamiento', width: 180 },
+    { field: 'idParkingSlot', headerName: 'Ubicacion', width: 80 },
   ]
 
 
@@ -238,8 +245,8 @@ function Home() {
     <div style={divContainerStyle}>
       <Box
         sx={{
-          height: 3000,
-          width: 2000,
+          height: '100%',
+          width: 1500,
           '& .green': {
             backgroundColor: '#66ff99',
             color: '#1a3e72',
@@ -265,8 +272,8 @@ function Home() {
         <DataGrid
           rows={carsWithReservationFirst}
           columns={columns}
-          pageSize={10}
-          rowsPerPageOptions={[5]}
+          pageSize={15}
+
         />
       </Box>
       <Modal show={reservationsModalShow} onHide={handleCloseReservationModal} size="sm">
