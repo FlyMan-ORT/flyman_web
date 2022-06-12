@@ -311,8 +311,8 @@ function Users() {
                 </Card.Header>
                 <Card.Body>
                   <Card.Text>Patente: {r.car.plate}</Card.Text>
-                  <Card.Text>Parking: </Card.Text>
-                  <Card.Text>Ubicacion: </Card.Text>
+                  <Card.Text>Parking: {r.car.parkingName} </Card.Text>
+                  <Card.Text>Ubicacion: {r.car.idParkingSlot} </Card.Text>
                 </Card.Body>
               </Card>
             )
