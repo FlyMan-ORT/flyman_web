@@ -97,7 +97,8 @@ function Users() {
             id: user._id,
             name: user.name,
             email: user.email,
-            phone: user.phone
+            phone: user.phone,
+            pin: user.pin
           }
         })
         setUsers(usersForTable);
@@ -137,6 +138,7 @@ function Users() {
       }
     },
     { field: 'phone', headerName: 'Telefono', width: 150 },
+    { field: 'pin', headerName: 'PIN', width: 100 },
     {
       field: 'email', headerName: 'Email',
       sortable: false,
@@ -211,6 +213,13 @@ function Users() {
                   onChange={e => setUserForEditOrDeletion({ ...userForEditOrDeletion, phone: e.target.value })}
                   autoFocus
                 />
+                <Form.Label>Pin</Form.Label>
+                <Form.Control
+                  type="number"
+                  defaultValue={userForEditOrDeletion.pin}
+                  onChange={e => setUserForEditOrDeletion({ ...userForEditOrDeletion, pin: e.target.value })}
+                  autoFocus
+                />
                 <Form.Label>Password</Form.Label>
                 <Form.Control
                   type="password"
@@ -225,6 +234,7 @@ function Users() {
               Cerrar
             </ButtonBootstrap>
             <ButtonBootstrap variant="primary" onClick={() => {
+              console.log(userForEditOrDeletion);
               updateUser(userForEditOrDeletion.id)
             }
             }>
@@ -274,6 +284,12 @@ function Users() {
                 <Form.Control
                   type="phone"
                   onChange={e => setNewUser({ ...newUser, phone: e.target.value })}
+
+                /> 
+                <Form.Label>Pin</Form.Label>
+                <Form.Control
+                  type="number"
+                  onChange={e => setNewUser({ ...newUser, pin: e.target.value })}
 
                 />
                 <Form.Label>Password</Form.Label>
