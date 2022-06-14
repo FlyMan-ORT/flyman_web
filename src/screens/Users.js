@@ -14,6 +14,7 @@ import { getMaintenanceUsers, createNewUser, updateOneUser, deleteOneUser } from
 import { getAllReservations } from '../api/reservations';
 import { Snackbar } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
+import LinearProgress from '@mui/material/LinearProgress';
 
 const divContainerStyle = {
   height: 800,
@@ -42,7 +43,8 @@ function Users() {
     setOpenSnackError(false);
     setOpenSnackSuccess(false)
   };
-
+  const [process, setProcess]=useState(true);
+ 
   const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
@@ -90,6 +92,7 @@ function Users() {
   useEffect(() => {
     async function fetchData() {
       try {
+        setProcess(true);
         const usersResponse = await getMaintenanceUsers();
         const reserves = await getAllReservations();
         const usersForTable = usersResponse.map((user) => {
@@ -98,11 +101,13 @@ function Users() {
             name: user.name,
             email: user.email,
             phone: user.phone,
-            pin: user.pin
+            pin: user.pin,
+            admin: user.admin
           }
         })
         setUsers(usersForTable);
         setReserves(reserves)
+        setProcess(false);
       } catch (error) {
         setSnackMessage(error.message);
         setOpenSnackError(true);
@@ -120,7 +125,7 @@ function Users() {
       type: 'actions',
       width: '120',
       renderCell: (params) => {
-        const dayAsignations = reserves.filter(r => r.user.email == params.row.email).filter(r => (moment().isSame(moment(r.startTime), 'day')))
+        const dayAsignations = reserves.filter(r => r.user.email === params.row.email).filter(r => (moment().isSame(moment(r.startTime), 'day')))
         return (
           <ButtonBootstrap variant="outline-secondary" onClick={() => {
             setUserForEditOrDeletion(params.row);
@@ -171,18 +176,24 @@ function Users() {
     },
   ];
 
-  return (
+   return (
     <div style={divContainerStyle}>
-      <ButtonBootstrap variant="light"
-        style={{ alignSelf: 'end', marginBottom: 10, backgroundColor: '#63e1fe' }}
+      <ButtonBootstrap variant="primary"
+        style={{ alignSelf: 'end', marginBottom: 10, backgroundColor: '#1976d2' }}
         onClick={() => setNewUserModalShow(true)}
-      >Nuevo Usuario
+      >[+] NUEVO USUARIO
       </ButtonBootstrap>
       <DataGrid
         rows={users}
         columns={columns}
         pageSize={25}
         rowsPerPageOptions={[5]}
+        components={{
+          LoadingOverlay: LinearProgress,
+        }}
+       loading={process}
+        {...users}
+        
       />
       <div>
         <Modal show={editModalShow}>
@@ -220,6 +231,13 @@ function Users() {
                   onChange={e => setUserForEditOrDeletion({ ...userForEditOrDeletion, pin: e.target.value })}
                   autoFocus
                 />
+                <Form.Label>Usuario administrador</Form.Label>
+                <Form.Check
+                  type="switch"
+                  defaultChecked= {userForEditOrDeletion.admin}
+                  onChange={e => setUserForEditOrDeletion({ ...userForEditOrDeletion, admin: e.target.checked })}
+                  autoFocus
+                />
                 <Form.Label>Password</Form.Label>
                 <Form.Control
                   type="password"
@@ -233,8 +251,9 @@ function Users() {
             <ButtonBootstrap variant="secondary" onClick={() => { setEditModalShow(false) }}>
               Cerrar
             </ButtonBootstrap>
-            <ButtonBootstrap variant="primary" onClick={() => {
-              console.log(userForEditOrDeletion);
+            <ButtonBootstrap variant="primary" 
+            style={{ backgroundColor: '#1976d2' }}
+            onClick={() => {
               updateUser(userForEditOrDeletion.id)
             }
             }>
@@ -292,6 +311,12 @@ function Users() {
                   onChange={e => setNewUser({ ...newUser, pin: e.target.value })}
 
                 />
+                <Form.Label>Usuario administrador</Form.Label>
+                <Form.Check
+                  type="switch"
+                  onChange={e => setNewUser({ ...newUser, admin: e.target.checked })}
+
+                />
                 <Form.Label>Password</Form.Label>
                 <Form.Control
                   type="password"
@@ -305,7 +330,9 @@ function Users() {
             <ButtonBootstrap variant="secondary" onClick={() => { setNewUserModalShow(false) }}>
               Cerrar
             </ButtonBootstrap>
-            <ButtonBootstrap variant="primary" onClick={() => {
+            <ButtonBootstrap variant="primary"
+            style={{ backgroundColor: '#1976d2' }} 
+            onClick={() => {
               createUser(newUser)
             }
             }>
