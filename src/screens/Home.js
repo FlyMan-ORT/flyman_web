@@ -16,6 +16,7 @@ import Badge from 'react-bootstrap/Badge'
 import { datesAscending } from '../utils/sorting'
 import { Snackbar } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
+import LinearProgress from '@mui/material/LinearProgress';
 
 
 const divContainerStyle = {
@@ -59,6 +60,7 @@ function Home() {
     setOpenSnackError(false);
     setOpenSnackSuccess(false)
   };
+  const [process, setProcess] = useState(true);
 
   const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -67,6 +69,7 @@ function Home() {
   useEffect(() => {
     async function fetchData() {
       try {
+        setProcess(true);
         const carsResponse = await getAllCars();
         setCars(carsResponse);
         const reservantionResponse = await getAllReservations();
@@ -74,6 +77,7 @@ function Home() {
         const fetchMaintenanceUsers = await getMaintenanceUsers();
         const valuesMaintananceUser = fetchMaintenanceUsers.map((m) => { return { value: m.email, label: m.name } })
         setMaintenanceUsers(valuesMaintananceUser)
+        setProcess(false);
       } catch (error) {
         setSnackMessage(error.message);
         setOpenSnackError(true);
@@ -102,6 +106,7 @@ function Home() {
   }, [mapViewModalShow])
 
   useEffect(() => {
+    setProcess(true);
     //separo las reservas del dia y las ordeno
     let filteredReservations = reservations.filter(r => (moment().isSame(moment(r.startTime), 'day'))).sort(datesAscending)
 
@@ -143,6 +148,7 @@ function Home() {
       }
     })
     setCarsWithReservationFirst(carsForTable);
+    setProcess(false);
 
   }, [cars, reservations])
 
@@ -229,8 +235,10 @@ function Home() {
       width: 130,
       align: 'center',
       cellClassName: (params) => {
-        if (params.row.battery < 11) return 'red';
-        if (params.row.battery < 12 && params.row.battery >= 11) return 'orange';
+        if (params.row.battery < 12) return 'red';
+        if (params.row.battery < 12.1 && params.row.battery >=12) return 'orange';
+        if (params.row.battery < 12.3 && params.row.battery >=12.1) return 'yellow';
+        if (params.row.battery >= 12.3) return 'green';
       }
     },
     { field: 'description', headerName: 'Modelo', width: 130 },
@@ -273,6 +281,11 @@ function Home() {
           rows={carsWithReservationFirst}
           columns={columns}
           pageSize={15}
+          components={{
+            LoadingOverlay: LinearProgress,
+          }}
+          loading={process}
+          {...reservations}
 
         />
       </Box>

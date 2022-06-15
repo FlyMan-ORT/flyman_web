@@ -4,6 +4,7 @@ import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import LocalCarWashIcon from '@mui/icons-material/LocalCarWash';
 import Modal from 'react-bootstrap/Modal';
 import { getAllServices } from '../api/services';
+import LinearProgress from '@mui/material/LinearProgress';
 
 const divContainerStyle = {
   height: 800,
@@ -20,6 +21,8 @@ function Historic() {
   const [detailsModalShow, setDetailsModalShow] = useState(false)
   const [serviceTasks, setServicesTasks] = useState([]);
   const handleClose = () => setDetailsModalShow(false);
+  const [process, setProcess] = useState(true);
+  const [updateFlag, setUpdateFlag] = useState(false);
 
 
   const columns = [
@@ -56,6 +59,7 @@ function Historic() {
   useEffect(() => {
     async function fetchData() {
       try {
+        setProcess(true);
         const servicesResponse = await getAllServices();
         const servicesForTable = servicesResponse.map((service) => {
           return {
@@ -69,11 +73,12 @@ function Historic() {
           }
         })
         setServices(servicesForTable);
+        setProcess(false);
       } catch (error) { 
       }
     }
     fetchData();
-  }, [])
+  }, [updateFlag])
 
   return (
     <div style={divContainerStyle}>
@@ -82,6 +87,11 @@ function Historic() {
         columns={columns}
         pageSize={10}
         rowsPerPageOptions={[5]}
+        components={{
+          LoadingOverlay: LinearProgress,
+        }}
+        loading={process}
+        {...services}
       />
       <Modal show={detailsModalShow} onHide={handleClose} size="sm">
         <Modal.Header closeButton>
