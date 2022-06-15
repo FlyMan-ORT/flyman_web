@@ -15,6 +15,8 @@ import { getAllReservations } from '../api/reservations';
 import { Snackbar } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 import LinearProgress from '@mui/material/LinearProgress';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+
 
 const divContainerStyle = {
   height: 800,
@@ -43,8 +45,8 @@ function Users() {
     setOpenSnackError(false);
     setOpenSnackSuccess(false)
   };
-  const [process, setProcess]=useState(true);
- 
+  const [process, setProcess] = useState(true);
+
   const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
@@ -152,6 +154,20 @@ function Users() {
         `${params.row.email}`,
     },
     {
+      field: 'admin', headerName: 'Administrador', width: 100, align: 'center',
+      renderCell: (params) => {
+        if (params.row.admin === true) {
+          return (
+            <CheckCircleIcon color = "primary"/>
+          )
+        } else {
+          return (
+            <p>-</p>
+          )
+        }
+      }
+    },
+    {
       headerName: 'Gestion',
       field: 'actions',
       type: 'actions',
@@ -176,7 +192,7 @@ function Users() {
     },
   ];
 
-   return (
+  return (
     <div style={divContainerStyle}>
       <ButtonBootstrap variant="primary"
         style={{ alignSelf: 'end', marginBottom: 10, backgroundColor: '#1976d2' }}
@@ -191,9 +207,9 @@ function Users() {
         components={{
           LoadingOverlay: LinearProgress,
         }}
-       loading={process}
+        loading={process}
         {...users}
-        
+
       />
       <div>
         <Modal show={editModalShow}>
@@ -234,7 +250,7 @@ function Users() {
                 <Form.Label>Usuario administrador</Form.Label>
                 <Form.Check
                   type="switch"
-                  defaultChecked= {userForEditOrDeletion.admin}
+                  defaultChecked={userForEditOrDeletion.admin}
                   onChange={e => setUserForEditOrDeletion({ ...userForEditOrDeletion, admin: e.target.checked })}
                   autoFocus
                 />
@@ -251,12 +267,12 @@ function Users() {
             <ButtonBootstrap variant="secondary" onClick={() => { setEditModalShow(false) }}>
               Cerrar
             </ButtonBootstrap>
-            <ButtonBootstrap variant="primary" 
-            style={{ backgroundColor: '#1976d2' }}
-            onClick={() => {
-              updateUser(userForEditOrDeletion.id)
-            }
-            }>
+            <ButtonBootstrap variant="primary"
+              style={{ backgroundColor: '#1976d2' }}
+              onClick={() => {
+                updateUser(userForEditOrDeletion.id)
+              }
+              }>
               Guardar cambios
             </ButtonBootstrap>
           </Modal.Footer>
@@ -304,7 +320,7 @@ function Users() {
                   type="phone"
                   onChange={e => setNewUser({ ...newUser, phone: e.target.value })}
 
-                /> 
+                />
                 <Form.Label>Pin</Form.Label>
                 <Form.Control
                   type="number"
@@ -331,11 +347,11 @@ function Users() {
               Cerrar
             </ButtonBootstrap>
             <ButtonBootstrap variant="primary"
-            style={{ backgroundColor: '#1976d2' }} 
-            onClick={() => {
-              createUser(newUser)
-            }
-            }>
+              style={{ backgroundColor: '#1976d2' }}
+              onClick={() => {
+                createUser(newUser)
+              }
+              }>
               Guardar cambios
             </ButtonBootstrap>
           </Modal.Footer>

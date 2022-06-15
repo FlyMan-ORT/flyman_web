@@ -235,8 +235,10 @@ function Home() {
       width: 130,
       align: 'center',
       cellClassName: (params) => {
-        if (params.row.battery < 11) return 'red';
-        if (params.row.battery < 12 && params.row.battery >= 11) return 'orange';
+        if (params.row.battery < 12) return 'red';
+        if (params.row.battery < 12.1 && params.row.battery >=12) return 'orange';
+        if (params.row.battery < 12.3 && params.row.battery >=12.1) return 'yellow';
+        if (params.row.battery >= 12.3) return 'green';
       }
     },
     { field: 'description', headerName: 'Modelo', width: 130 },
