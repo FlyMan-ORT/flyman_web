@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
-import LocalCarWashIcon from '@mui/icons-material/LocalCarWash';
 import Modal from 'react-bootstrap/Modal';
 import { getAllServices } from '../api/services';
 import LinearProgress from '@mui/material/LinearProgress';
+import moment from 'moment';
 
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import StarRateIcon from '@mui/icons-material/StarRate';
 import ReportIcon from '@mui/icons-material/Report';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Card from 'react-bootstrap/Card'
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import BuildCircleIcon from '@mui/icons-material/BuildCircle';
 
 
 const divContainerStyle = {
@@ -27,11 +29,10 @@ function Historic() {
 
   const [services, setServices] = useState([]);
   const [detailsModalShow, setDetailsModalShow] = useState(false)
+  const [noDataModalShow, setNoDataModalShow] = useState(false);
   const [serviceDetails, setServiceDetails] = useState([]);
-  console.log(serviceDetails)
   const handleClose = () => setDetailsModalShow(false);
   const [process, setProcess] = useState(true);
-  const [updateFlag, setUpdateFlag] = useState(false);
 
 
   const columns = [
@@ -42,9 +43,13 @@ function Historic() {
       width: '70',
 
       getActions: (params) => [
-        <GridActionsCellItem icon={<LocalCarWashIcon />} onClick={() => {
-          setServiceDetails(params.row)
-          setDetailsModalShow(true)
+        <GridActionsCellItem icon={<AssignmentIcon />} onClick={() => {
+          if (params.row.hasOwnProperty('cleanTask')) {
+            setServiceDetails(params.row)
+            setDetailsModalShow(true)
+          } else {
+            setNoDataModalShow(true)
+          }
         }
         }
           label="Print" />,
@@ -53,13 +58,39 @@ function Historic() {
     {
       field: 'userEmail', headerName: 'Operario',
       sortable: false,
-      width: 280,
+      width: 250,
       valueGetter: (params) =>
         `${params.row.userEmail}`,
     },
+    {
+      headerName: 'Carga',
+      field: 'fuelLoad',
+      width: 60,
+      align: 'center',
+      renderCell: (params) => {
+        if (params.row.fuelLoad) {
+          return (<MonetizationOnIcon color='success'></MonetizationOnIcon>)
+        } else {
+          return (<p>-</p>)
+        }
+      }
+    },
+    {
+      headerName: 'Daño',
+      field: 'isDamaged',
+      width: 60,
+      align: 'center',
+      renderCell: (params) => {
+        if (params.row.isDamaged) {
+          return (<BuildCircleIcon color='error'></BuildCircleIcon>)
+        }
+        else {
+          return (<p>-</p>)
+        }
+      }
+    },
     { field: 'id', headerName: 'ID', width: 70, hide: true },
     { field: 'plate', headerName: 'Patente', width: 100 },
-    { field: 'reservationId', headerName: 'Reserva', width: 150 },
     { field: 'startDate', headerName: 'Inicio', width: 170 },
     { field: 'endDate', headerName: 'Fin', width: 170 },
 
@@ -71,13 +102,22 @@ function Historic() {
         setProcess(true);
         const servicesResponse = await getAllServices();
         const servicesForTable = servicesResponse.map((service) => {
-          return {
+          if (!service.hasOwnProperty('tasks')) {
+            return {
+              id: service._id,
+              reservationId: service.reservationId,
+              startDate: moment(service.startDate).format('DD/MM/YYYY hh:mm [hs]'),
+              endDate: service.endDate ? moment(service.endDate).format('DD/MM/YYYY hh:mm [hs]') : "",
+              plate: service.plate,
+              userEmail: service.userEmail,
+            }
+          } else return {
             id: service._id,
             plate: service.plate,
             reservationId: service.reservationId,
             userEmail: service.userEmail,
-            startDate: (new Date(service.startDate)).toLocaleString('en-GB', { timeZone: 'UTC' }),
-            endDate: (service.endDate ? (new Date(service.endDate)).toLocaleString('en-GB', { timeZone: 'UTC' }) : ""),
+            startDate: moment(service.startDate).format('DD/MM/YYYY hh:mm [hs]'),
+            endDate: moment(service.endDate).format('DD/MM/YYYY hh:mm [hs]'),
             cleanliness: service.cleanliness,
             carImage: service.carImage,
             cleanTask: service.tasks[0].cleanTask,
@@ -87,7 +127,9 @@ function Historic() {
             securityKit: service.securityKit,
             tires: service.tires,
             isDamaged: service.damage.isDamaged,
-            damageDescription: service.damage.damageDescription
+            damageDescription: service.damage.damageDescription,
+            fuelLoad: service.fuel.fuelLoad,
+            fuelPrice: service.fuel.fuelPrice
 
           }
         })
@@ -97,15 +139,15 @@ function Historic() {
       }
     }
     fetchData();
-  }, [updateFlag])
+  }, [])
 
   return (
     <div style={divContainerStyle}>
       <DataGrid
         rows={services}
         columns={columns}
-        pageSize={10}
-        rowsPerPageOptions={[5]}
+        pageSize={20}
+        rowsPerPageOptions={[20]}
         components={{
           LoadingOverlay: LinearProgress,
         }}
@@ -121,17 +163,19 @@ function Historic() {
 
         </Modal.Header>
         <Modal.Body>
+
           <div style={{
             alignItems: 'center', display: 'flex',
             flexDirection: 'column'
           }}>
             <img src={serviceDetails.carImage} style={{ height: 150 }}></img>
-            <h6 style={{marginBottom: 30}}>{serviceDetails.userEmail}</h6>
+            <h7 style={{ marginBottom: 10 }}>{serviceDetails.plate}</h7>
+            <h6 style={{ marginBottom: 30 }}>{serviceDetails.userEmail}</h6>
             <h6>Limpieza al iniciar servicio</h6>
             <div style={{
               alignItems: 'center', display: 'flex',
               flexDirection: 'row', marginBottom: 30
-            }}>              
+            }}>
               <StarRateIcon color='primary'></StarRateIcon>
               <StarRateIcon color={serviceDetails.cleanliness > 1 ? 'primary' : 'disabled'}></StarRateIcon>
               <StarRateIcon color={serviceDetails.cleanliness > 2 ? 'primary' : 'disabled'}></StarRateIcon>
@@ -190,7 +234,7 @@ function Historic() {
               display: 'flex',
               flexDirection: 'column',
               width: '30%',
-              paddingRight:10
+              paddingRight: 10
             }}>
               <div style={{
                 display: 'flex',
@@ -232,7 +276,7 @@ function Historic() {
               display: 'flex',
               flexDirection: 'column',
               width: '30%',
-              paddingRight:10
+              paddingRight: 10
             }}>
               {
                 serviceDetails.isDamaged ?
@@ -277,14 +321,42 @@ function Historic() {
                   </div>
               }
             </div>
-
-
           </div>
           {/* div final */}
 
+          <div style={{
+            alignItems: 'center', display: 'flex',
+            flexDirection: 'column', paddingTop: 30
+          }}>
+            {
+              serviceDetails.fuelLoad ?
+                <div style={{
+                  alignItems: 'center', display: 'flex',
+                  flexDirection: 'column'
+                }}>
+
+                  <h6>Se cargó combustible: <MonetizationOnIcon color='success'></MonetizationOnIcon><b>{serviceDetails.fuelPrice}</b></h6>
+                </div>
+                :
+                null
+            }
 
 
+          </div>
 
+
+        </Modal.Body>
+      </Modal>
+
+      <Modal size="sm" show={noDataModalShow} onHide={() => setNoDataModalShow(false)} aria-labelledby="example-modal-sizes-title-sm" style={{ textAlignL: 'center' }}>
+        <Modal.Header closeButton>
+          <Modal.Title id="example-modal-sizes-title-sm">
+            Detalles del servicio
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>El servicio aún no ha finalizado.</p>
+          <p>No pueden mostrarse los detalles.</p>
         </Modal.Body>
       </Modal>
     </div >
