@@ -166,7 +166,7 @@ function Users() {
           <div style={{
             display: 'flex',
             flexDirection: 'row'}}>
-            <p style={{paddingRight:10}}>••••</p>
+            <p style={{paddingRight:20}}>••••</p>
             <VisibilityIcon color="disabled" onClick={() => { setIsPinShowing(true) }} />
           </div>
           
