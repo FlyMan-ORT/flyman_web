@@ -17,6 +17,7 @@ import { datesAscending } from '../utils/sorting'
 import { Snackbar } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 import LinearProgress from '@mui/material/LinearProgress';
+import Chip from '@mui/material/Chip';
 
 
 const divContainerStyle = {
@@ -236,8 +237,8 @@ function Home() {
       align: 'center',
       cellClassName: (params) => {
         if (params.row.battery < 12) return 'red';
-        if (params.row.battery < 12.1 && params.row.battery >=12) return 'orange';
-        if (params.row.battery < 12.3 && params.row.battery >=12.1) return 'yellow';
+        if (params.row.battery < 12.1 && params.row.battery >= 12) return 'orange';
+        if (params.row.battery < 12.3 && params.row.battery >= 12.1) return 'yellow';
         if (params.row.battery >= 12.3) return 'green';
       }
     },
@@ -289,9 +290,9 @@ function Home() {
 
         />
       </Box>
-      <Modal show={reservationsModalShow} onHide={handleCloseReservationModal} size="sm">
+      <Modal show={reservationsModalShow} onHide={handleCloseReservationModal} size="m">
         <Modal.Header closeButton>
-          <Modal.Title>Reservas del dia</Modal.Title>
+          <Modal.Title>Reservas del dia </Modal.Title>
         </Modal.Header>
         <Modal.Body>{selectedCarReservations.map(e => {
           if (moment().isSame(moment(e.startTime), 'day')) {
