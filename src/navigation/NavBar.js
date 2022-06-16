@@ -35,10 +35,7 @@ function NavBar() {
                 </Button>
                 <Button variant="contained" style={buttonStyle}>
                     <Link to="/Historic" style={linkStyle}>Historial</Link>
-                </Button>   
-                <Button variant="contained" style={buttonStyle}>
-                    <Link to="/Map" style={linkStyle}>Mapa</Link>
-                </Button>
+                </Button>               
             </div>
             <Routes>
                 <Route path="/" element={<Home />} />
