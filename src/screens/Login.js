@@ -19,7 +19,6 @@ function Login() {
     const dispatch = useDispatch();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [isPasswordVisible, setIsPasswordVisible] = useState(true);
     const failedLogin = useSelector(state => isFailedLogin(state));
 
     const userLogin = async () => {

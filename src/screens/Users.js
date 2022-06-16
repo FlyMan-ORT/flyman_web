@@ -158,7 +158,7 @@ function Users() {
       renderCell: (params) => {
         if (params.row.admin === true) {
           return (
-            <CheckCircleIcon color = "primary"/>
+            <CheckCircleIcon color="primary" />
           )
         } else {
           return (
@@ -202,14 +202,13 @@ function Users() {
       <DataGrid
         rows={users}
         columns={columns}
-        pageSize={25}
-        rowsPerPageOptions={[5]}
+        pageSize={20}
+        rowsPerPageOptions={[20]}
         components={{
           LoadingOverlay: LinearProgress,
         }}
         loading={process}
         {...users}
-
       />
       <div>
         <Modal show={editModalShow}>

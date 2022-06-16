@@ -17,7 +17,6 @@ import { datesAscending } from '../utils/sorting'
 import { Snackbar } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 import LinearProgress from '@mui/material/LinearProgress';
-import Chip from '@mui/material/Chip';
 
 
 const divContainerStyle = {
@@ -156,6 +155,7 @@ function Home() {
   const columns = [
     {
       headerName: 'Reservas',
+      field: 'header',
       renderCell: (params) => {
         const dayReservations = reservations.filter(r => r.car.plate == params.row.plate).filter(r => (moment().isSame(moment(r.startTime), 'day')))
         return (
@@ -281,13 +281,13 @@ function Home() {
         <DataGrid
           rows={carsWithReservationFirst}
           columns={columns}
-          pageSize={15}
+          pageSize={20}
+          rowsPerPageOptions={[20]}
           components={{
             LoadingOverlay: LinearProgress,
           }}
           loading={process}
           {...reservations}
-
         />
       </Box>
       <Modal show={reservationsModalShow} onHide={handleCloseReservationModal} size="m">
