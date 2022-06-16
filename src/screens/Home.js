@@ -189,12 +189,13 @@ function Home() {
       field: 'Asignar',
       type: 'actions',
       getActions: (params) => [
-        <GridActionsCellItem icon={<AssignmentIndIcon fontSize='large' />}
+        <GridActionsCellItem icon={<AssignmentIndIcon fontSize='large' label='Asignar' />}
           onClick={() => {
             setCarForReservation(cars.find(car => car.plate === params.row.plate))
             setCreateReserveModalShow(true)
           }
           }
+          label="Asignar"
         />
       ]
     },
@@ -209,7 +210,8 @@ function Home() {
             setMapViewModalShow(true)
           }
           }
-          label="Delete" />
+          label="Mapa"
+        />
       ]
     },
     { field: 'id', headerName: 'ID', width: 70, hide: true },
