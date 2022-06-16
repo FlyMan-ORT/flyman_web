@@ -16,6 +16,8 @@ import { Snackbar } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 import LinearProgress from '@mui/material/LinearProgress';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 
 const divContainerStyle = {
@@ -41,6 +43,8 @@ function Users() {
   const [openSnackError, setOpenSnackError] = useState(false);
   const [openSnackSuccess, setOpenSnackSuccess] = useState(false);
   const [snackMessage, setSnackMessage] = useState('');
+  const [isPinShowing, setIsPinShowing] = useState(false);  
+
   const handleClick = () => {
     setOpenSnackError(false);
     setOpenSnackSuccess(false)
@@ -145,7 +149,31 @@ function Users() {
       }
     },
     { field: 'phone', headerName: 'Telefono', width: 150 },
-    { field: 'pin', headerName: 'PIN', width: 100 },
+    {
+      field: 'pin', headerName: 'PIN', width: 100,
+      renderCell: (params) => {
+        if (isPinShowing) {
+          return (
+            <div style={{
+              display: 'flex',
+              flexDirection: 'row'
+            }}>
+              <p onClick={() => { setIsPinShowing(false) }} style={{paddingRight:10}}>{params.row.pin}</p>
+              <VisibilityOffIcon color="disabled" onClick={() => { setIsPinShowing(false) }}></VisibilityOffIcon>
+            </div>)
+        }
+        return (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'row'}}>
+            <p style={{paddingRight:10}}>••••</p>
+            <VisibilityIcon color="disabled" onClick={() => { setIsPinShowing(true) }} />
+          </div>
+          
+        )
+
+      }
+    },
     {
       field: 'email', headerName: 'Email',
       sortable: false,
@@ -158,7 +186,7 @@ function Users() {
       renderCell: (params) => {
         if (params.row.admin === true) {
           return (
-            <CheckCircleIcon color = "primary"/>
+            <CheckCircleIcon color="primary" />
           )
         } else {
           return (
