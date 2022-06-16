@@ -17,6 +17,7 @@ import { datesAscending } from '../utils/sorting'
 import { Snackbar } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 import LinearProgress from '@mui/material/LinearProgress';
+import MapModal from './Home/components/Modals/MapModal';
 
 
 const divContainerStyle = {
@@ -28,21 +29,14 @@ const divContainerStyle = {
   paddingRight: 50,
 };
 
-const mapModalStyle = {
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center'
-}
-
 function Home() {
   const [cars, setCars] = useState([]);
   const [reservations, setReservations] = useState([]);
   const [carsWithReservationFirst, setCarsWithReservationFirst] = useState([]);
   const [selectedCarReservations, setSelectedCarReservations] = useState([])
   const [reservationsModalShow, setReservationsModalShow] = useState(false)
-  const [mapViewModalShow, setMapViewModalShow] = useState(false)
-  const [carForMapView, setCarForMapView] = useState({ position: { latitude: 0, longitude: 0 } })
-  const [sourceForMap, setSourceForMap] = useState('')
+  const [showMapModal, setShowMapModal] = useState(false);
+  const [carPosition, setCarPosition] = useState({ latitude: 0, longitude: 0 });
   const [createReserveModalShow, setCreateReserveModalShow] = useState(false)
   const [maintenanceUsers, setMaintenanceUsers] = useState([])
   const [reservationSelectedDay, setDiaReserva] = useState(moment().format('YYYY-MM-DD'))
@@ -54,7 +48,7 @@ function Home() {
   const [snackMessage, setSnackMessage] = useState('');
   const [updateFlag, setUpdateFlag] = useState(false);
   const handleCloseReservationModal = () => setReservationsModalShow(false);
-  const handleCloseMapViewModal = () => setMapViewModalShow(false);
+
   const handleCloseCreateReserveModal = () => setCreateReserveModalShow(false);
   const handleClick = () => {
     setOpenSnackError(false);
@@ -65,6 +59,16 @@ function Home() {
   const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
+
+  const onHideMapModal = () => {
+    setShowMapModal(false);
+    setCarPosition({ latitude: 0, longitude: 0 });
+  }
+
+  const onOpenMapModal = (car) => {
+    setCarPosition(car.position);
+    setShowMapModal(true);
+  }
 
   useEffect(() => {
     async function fetchData() {
@@ -100,10 +104,6 @@ function Home() {
       setOpenSnackError(true);
     }
   };
-
-  useEffect(() => {
-    setSourceForMap('<iframe width = "800" height = "650" style = "border:0" loading = "lazy" allowfullscreen referrerpolicy = "no-referrer-when-downgrade" src = "https://maps.google.com/maps?q=' + carForMapView.position.latitude + ',' + carForMapView.position.longitude + '&hl=es&z=14&amp;output=embed"></iframe >')
-  }, [mapViewModalShow])
 
   useEffect(() => {
     setProcess(true);
@@ -205,11 +205,7 @@ function Home() {
       type: 'actions',
       getActions: (params) => [
         <GridActionsCellItem icon={<LocationOnIcon fontSize='large' />}
-          onClick={async () => {
-            setCarForMapView(params.row)
-            setMapViewModalShow(true)
-          }
-          }
+          onClick={() => onOpenMapModal(params.row)}
           label="Mapa"
         />
       ]
@@ -314,15 +310,8 @@ function Home() {
         </Modal.Body>
       </Modal>
 
-      <Modal show={mapViewModalShow} onHide={handleCloseMapViewModal} size={'xl'}  >
-        <Modal.Header closeButton>
-          <Modal.Title>Vista de mapa</Modal.Title>
-        </Modal.Header>
-        <Modal.Body style={mapModalStyle}>
-          <div dangerouslySetInnerHTML={{ __html: sourceForMap }}></div>
-        </Modal.Body>
+      <MapModal show={showMapModal} onHide={onHideMapModal} position={carPosition} />
 
-      </Modal>
       <Modal show={createReserveModalShow} onHide={handleCloseCreateReserveModal}>
         <Modal.Header >
           <Modal.Title>Asignar reserva a operario</Modal.Title>
