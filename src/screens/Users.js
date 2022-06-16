@@ -18,6 +18,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import AddIcon from '@mui/icons-material/Add';
 
 
 const divContainerStyle = {
@@ -225,7 +226,7 @@ function Users() {
       <ButtonBootstrap variant="primary"
         style={{ alignSelf: 'end', marginBottom: 10, backgroundColor: '#1976d2' }}
         onClick={() => setNewUserModalShow(true)}
-      >[+] NUEVO USUARIO
+      ><AddIcon/> Nuevo Usuario
       </ButtonBootstrap>
       <DataGrid
         rows={users}
