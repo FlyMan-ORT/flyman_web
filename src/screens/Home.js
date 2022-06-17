@@ -8,7 +8,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import ButtonBootstrap from 'react-bootstrap/Button'
 import Badge from 'react-bootstrap/Badge'
 import { getMaintenanceUsers } from '../api/users';
-import { getAllReservations, createReserve, cancelReserve } from '../api/reservations';
+import { getAllReservations, createReserve } from '../api/reservations';
 import { getAllCars } from '../api/cars';
 import { datesAscending } from '../utils/sorting'
 import MapModal from './Home/components/Modals/MapModal';
@@ -127,7 +127,6 @@ function Home() {
       setShowCreateReservationModal(false);
       setUpdateFlag(!updateFlag);
     } catch (error) {
-      console.log(error.message);
       onErrorSnackbarOpen(error.message);
     }
   };
@@ -285,21 +284,6 @@ function Home() {
     { field: 'fuelType', headerName: 'Combustible', width: 130 },
     { field: 'parkingName', headerName: 'Estacionamiento', width: 180 },
     { field: 'idParkingSlot', headerName: 'Ubicacion', width: 80 }
-    // {
-    //   headerName: 'Gestion',
-    //   field: 'actions',
-    //   type: 'actions',
-    //   width: '90',
-
-    //   getActions: (params) => [
-    //     <GridActionsCellItem icon={<DeleteIcon />}
-    //       onClick={() => {
-    //         setReserveForCancel(params.row)
-    //       }
-    //       }
-    //       label="Delete" />,
-    //   ]
-    // },
   ]
 
 
@@ -364,7 +348,7 @@ function Home() {
         onHide={onHideCreateReservationModal}
         plate={carForReservation.plate}
         users={maintenanceUsers}
-        onCreate={(plate, mail, day, time) => createReservation(plate, mail, day, time)}
+        onCreate={createReservation}
       />
 
       <ConfirmCancelModal
