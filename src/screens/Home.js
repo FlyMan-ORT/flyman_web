@@ -1,21 +1,20 @@
-import { useEffect, useState, forwardRef } from 'react';
+import moment from 'moment';
+import { useEffect, useState } from 'react';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import LinearProgress from '@mui/material/LinearProgress';
 import ButtonBootstrap from 'react-bootstrap/Button'
+import Badge from 'react-bootstrap/Badge'
 import { getMaintenanceUsers } from '../api/users';
 import { getAllReservations, createReserve } from '../api/reservations';
 import { getAllCars } from '../api/cars';
-import moment from 'moment';
-import Badge from 'react-bootstrap/Badge'
 import { datesAscending } from '../utils/sorting'
-import { Snackbar } from '@mui/material';
-import MuiAlert from '@mui/material/Alert';
-import LinearProgress from '@mui/material/LinearProgress';
 import MapModal from './Home/components/Modals/MapModal';
 import ReservationsModal from './Home/components/Modals/ReservationsModal';
 import CreateReservationModal from './Home/components/Modals/CreateReservationModal';
+import Snackbar from '../components/Snackbar';
 
 
 const divContainerStyle = {
@@ -38,36 +37,55 @@ function Home() {
   const [showCreateReservationModal, setShowCreateReservationModal] = useState(false);
   const [maintenanceUsers, setMaintenanceUsers] = useState([]);
   const [carForReservation, setCarForReservation] = useState({});
-  const [openSnackError, setOpenSnackError] = useState(false);
-  const [openSnackSuccess, setOpenSnackSuccess] = useState(false);
+  const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false);
+  const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false);
   const [snackMessage, setSnackMessage] = useState('');
   const [updateFlag, setUpdateFlag] = useState(false);
-
-  const handleClick = () => {
-    setOpenSnackError(false);
-    setOpenSnackSuccess(false)
-  };
   const [process, setProcess] = useState(true);
-
-  const Alert = forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-  });
-
-  const onHideMapModal = () => {
-    setShowMapModal(false);
-    setCarPosition({ latitude: 0, longitude: 0 });
-  }
 
   const onOpenMapModal = (car) => {
     setCarPosition(car.position);
     setShowMapModal(true);
   }
 
-  const onHideReservationsModal = () => setShowReservationsModal(false);
+  const onHideMapModal = () => {
+    setShowMapModal(false);
+    setCarPosition({ latitude: 0, longitude: 0 });
+  }
+
+  const onHideReservationsModal = () => {
+    setShowReservationsModal(false);
+  }
+
+  const onOpenCreateReservationsModal = (car) => {
+    setCarForReservation(car);
+    setShowCreateReservationModal(true);
+  }
 
   const onHideCreateReservationModal = () => {
     setShowCreateReservationModal(false);
   }
+
+  const onErrorSnackbarOpen = (message) => {
+    setSnackMessage(error.message);
+    setOpenErrorSnackbar(true);
+  }
+
+  const onErrorSnackbarClose = () => {
+    setOpenErrorSnackbar(false);
+    setSnackMessage('');
+  }
+
+  const onSuccessSnackbarOpen = (message) => {
+    setSnackMessage(message);
+    setOpenSuccessSnackbar(true);
+  }
+
+  const onSuccessSnackbarClose = () => {
+    setOpenSuccessSnackbar(false);
+    setSnackMessage('');
+  }
+
 
   useEffect(() => {
     async function fetchData() {
@@ -82,25 +100,21 @@ function Home() {
         setMaintenanceUsers(valuesMaintananceUser)
         setProcess(false);
       } catch (error) {
-        setSnackMessage(error.message);
-        setOpenSnackError(true);
+        onErrorSnackbarOpen(error.message);
       }
     }
     fetchData();
   }, [updateFlag])
 
   async function createReservation(plate, mail, day, time) {
-    console.log(plate, mail, day, time);
     try {
       const reservation = { plate, mail, day, time };
       await createReserve(reservation);
+      onSuccessSnackbarOpen('Reserva creada!');
       setShowCreateReservationModal(false);
-      setSnackMessage('Reserva creada!');
-      setOpenSnackSuccess(true);
-      setUpdateFlag(!updateFlag)
+      setUpdateFlag(!updateFlag);
     } catch (error) {
-      setSnackMessage(error.message);
-      setOpenSnackError(true);
+      onErrorSnackbarOpen(error.message);
     }
   };
 
@@ -190,8 +204,7 @@ function Home() {
       getActions: (params) => [
         <GridActionsCellItem icon={<AssignmentIndIcon fontSize='large' label='Asignar' />}
           onClick={() => {
-            setCarForReservation(cars.find(car => car.plate === params.row.plate))
-            setShowCreateReservationModal(true)
+            onOpenCreateReservationsModal(cars.find(car => car.plate === params.row.plate));
           }
           }
           label="Asignar"
@@ -308,17 +321,19 @@ function Home() {
         onCreate={(plate, mail, day, time) => createReservation(plate, mail, day, time)}
       />
 
-      <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={openSnackError} autoHideDuration={6000} onClose={handleClick}>
-        <Alert onClose={handleClick} severity="error" sx={{ width: '100%' }}>
-          {snackMessage}
-        </Alert>
-      </Snackbar>
-      <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={openSnackSuccess} autoHideDuration={6000} onClose={handleClick}>
-        <Alert onClose={handleClick} severity="success" sx={{ width: '100%' }}>
-          {snackMessage}
-        </Alert>
-      </Snackbar>
-      {/* <SnackBarFlyMan severity={'error'} message={snackMessage} open={openSnackError} handleClick={handleClick} /> */}
+      <Snackbar
+        open={openErrorSnackbar}
+        onClose={onErrorSnackbarClose}
+        message={snackMessage}
+        severity='error'
+      />
+
+      <Snackbar
+        open={openSuccessSnackbar}
+        onClose={onSuccessSnackbarClose}
+        message={snackMessage}
+        severity='success'
+      />
     </div>
   );
 }
