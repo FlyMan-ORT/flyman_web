@@ -11,13 +11,13 @@ import { getAllReservations, createReserve } from '../api/reservations';
 import { getAllCars } from '../api/cars';
 import { dateToString } from '../utils/dateParsers';
 import moment from 'moment';
-import Card from 'react-bootstrap/Card'
 import Badge from 'react-bootstrap/Badge'
 import { datesAscending } from '../utils/sorting'
 import { Snackbar } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 import LinearProgress from '@mui/material/LinearProgress';
 import MapModal from './Home/components/Modals/MapModal';
+import ReservationsModal from './Home/components/Modals/ReservationsModal';
 
 
 const divContainerStyle = {
@@ -34,20 +34,19 @@ function Home() {
   const [reservations, setReservations] = useState([]);
   const [carsWithReservationFirst, setCarsWithReservationFirst] = useState([]);
   const [selectedCarReservations, setSelectedCarReservations] = useState([])
-  const [reservationsModalShow, setReservationsModalShow] = useState(false)
+  const [showReservationsModal, setShowReservationsModal] = useState(false);
   const [showMapModal, setShowMapModal] = useState(false);
   const [carPosition, setCarPosition] = useState({ latitude: 0, longitude: 0 });
-  const [createReserveModalShow, setCreateReserveModalShow] = useState(false)
-  const [maintenanceUsers, setMaintenanceUsers] = useState([])
-  const [reservationSelectedDay, setDiaReserva] = useState(moment().format('YYYY-MM-DD'))
-  const [reservationSelectedTime, setHoraReserva] = useState(moment().startOf('hour').format('hh:mm'))
-  const [reservationSelectedEmployee, setMailDeOperario] = useState("")
-  const [carForReservation, setCarForReservation] = useState({})
+  const [createReserveModalShow, setCreateReserveModalShow] = useState(false);
+  const [maintenanceUsers, setMaintenanceUsers] = useState([]);
+  const [reservationSelectedDay, setDiaReserva] = useState(moment().format('YYYY-MM-DD'));
+  const [reservationSelectedTime, setHoraReserva] = useState(moment().startOf('hour').format('hh:mm'));
+  const [reservationSelectedEmployee, setMailDeOperario] = useState("");
+  const [carForReservation, setCarForReservation] = useState({});
   const [openSnackError, setOpenSnackError] = useState(false);
   const [openSnackSuccess, setOpenSnackSuccess] = useState(false);
   const [snackMessage, setSnackMessage] = useState('');
   const [updateFlag, setUpdateFlag] = useState(false);
-  const handleCloseReservationModal = () => setReservationsModalShow(false);
 
   const handleCloseCreateReserveModal = () => setCreateReserveModalShow(false);
   const handleClick = () => {
@@ -69,6 +68,8 @@ function Home() {
     setCarPosition(car.position);
     setShowMapModal(true);
   }
+
+  const onHideReservationsModal = () => setShowReservationsModal(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -162,7 +163,7 @@ function Home() {
           <ButtonBootstrap variant="outline-secondary" onClick={() => {
             setSelectedCarReservations(reservations.filter(r => r.car.plate === params.row.plate)
               .sort(datesAscending))
-            setReservationsModalShow(true)
+            setShowReservationsModal(true)
           }}>
             Ver <Badge bg="dark">{dayReservations.length}</Badge>
             <span className="visually-hidden"></span>
@@ -288,28 +289,8 @@ function Home() {
           {...reservations}
         />
       </Box>
-      <Modal show={reservationsModalShow} onHide={handleCloseReservationModal} size="m">
-        <Modal.Header closeButton>
-          <Modal.Title>Reservas del dia </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>{selectedCarReservations.map(e => {
-          if (moment().isSame(moment(e.startTime), 'day')) {
-            return (
-              <Card border={(moment(e.startTime).isAfter(moment(), 'hour')) ? "success" : "danger"}
-                style={{ marginBottom: 10 }}>
-                <Card.Header style={{ alignItems: 'center' }}>
-                  <b>{moment(e.startTime).format('hh:mm A')} - {moment(e.endTime).format('hh:mm A')}</b>
-                </Card.Header>
-                <Card.Body>
-                  <Card.Text>{e.user.email}</Card.Text>
-                </Card.Body>
-              </Card>
-            )
-          }
-        })}
-        </Modal.Body>
-      </Modal>
 
+      <ReservationsModal show={showReservationsModal} onHide={onHideReservationsModal} reservations={selectedCarReservations} />
       <MapModal show={showMapModal} onHide={onHideMapModal} position={carPosition} />
 
       <Modal show={createReserveModalShow} onHide={handleCloseCreateReserveModal}>
