@@ -94,14 +94,11 @@ function Home() {
         setProcess(true);
         const carsResponse = await getAllCars();
         setCars(carsResponse);
-        console.log(cars)
         const reservantionResponse = await getAllReservations();
         setReservations(reservantionResponse)
-        console.log(reservations)
         const fetchMaintenanceUsers = await getMaintenanceUsers();
         const valuesMaintananceUser = fetchMaintenanceUsers.map((m) => { return { value: m.email, label: m.name } })
         setMaintenanceUsers(valuesMaintananceUser)
-        console.log(maintenanceUsers)
         setProcess(false);
       } catch (error) {
         onErrorSnackbarOpen(error.message);
@@ -118,7 +115,6 @@ function Home() {
       setShowCreateReservationModal(false);
       setUpdateFlag(!updateFlag);
     } catch (error) {
-      console.log(error.message);
       onErrorSnackbarOpen(error.message);
     }
   };
