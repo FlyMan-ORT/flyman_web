@@ -26,7 +26,7 @@ const CreateReservationModal = ({ show, onHide, reservations, onCreate }) => {
                                 <Card.Text>{reservation.user.email}</Card.Text>
 
                             </Card.Body>
-                         <ButtonBootstrap variant="text" color= "#ff0000" onClick={() => {
+                            <ButtonBootstrap variant="text" color="#ff0000" onClick={() => {
                                 onCreate(reservation)
                             }}>
                                 Eliminar reserva
@@ -40,4 +40,4 @@ const CreateReservationModal = ({ show, onHide, reservations, onCreate }) => {
     )
 }
 
-export default ReservationsModal;
+export default CreateReservationModal;
