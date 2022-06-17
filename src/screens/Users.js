@@ -8,6 +8,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import AddIcon from '@mui/icons-material/Add';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import ButtonBootstrap from 'react-bootstrap/Button'
 import Badge from 'react-bootstrap/Badge'
 import { datesAscending } from '../utils/sorting'
@@ -257,13 +258,12 @@ function Users() {
 
   return (
     <div style={divContainerStyle}>
-
-      <ButtonBootstrap
-        variant="primary"
+       <ButtonBootstrap 
+        variant="light"
         style={{ alignSelf: 'end', marginBottom: 10, backgroundColor: '#1976d2' }}
         onClick={onOpenCreateUserModal}
       >
-        <AddIcon /> Nuevo Usuario
+        <PersonAddIcon /> Nuevo Usuario
       </ButtonBootstrap>
 
       <DataGrid

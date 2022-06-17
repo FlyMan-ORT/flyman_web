@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Button from '@mui/material/Button';
 import { logout } from '../features/login';
 import { getSuccessfulLogin } from '../selectors/login';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 const topBarDivStyle = {
   display: 'flex',
@@ -28,7 +29,7 @@ function TopBar() {
       <div style={loginButtonStyle}>
         {
           (isAuthenticated()) ?
-            <Button variant="contained" onClick={() => logoutUser()}>Logout</Button>
+            <Button variant="text" onClick={() => logoutUser()}> <LogoutIcon/> Cerrar Sesion</Button>
             :
             null
         }
