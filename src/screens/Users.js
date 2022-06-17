@@ -3,8 +3,6 @@ import React, { useEffect, useState, forwardRef } from 'react';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { Snackbar } from '@mui/material';
-import MuiAlert from '@mui/material/Alert';
 import LinearProgress from '@mui/material/LinearProgress';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -13,15 +11,13 @@ import AddIcon from '@mui/icons-material/Add';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import ButtonBootstrap from 'react-bootstrap/Button'
-import Card from 'react-bootstrap/Card'
 import Badge from 'react-bootstrap/Badge'
 import { datesAscending } from '../utils/sorting'
 import { getMaintenanceUsers, createNewUser, updateOneUser, deleteOneUser } from '../api/users';
 import { getAllReservations } from '../api/reservations';
 import DeleteUserModal from './Users/components/modals/DeleteUserModal';
 import AssignmentsModal from './Users/components/modals/AssignmentsModal';
-
-
+import Snackbar from '../components/Snackbar';
 
 const divContainerStyle = {
   height: 800,
@@ -43,20 +39,11 @@ function Users() {
   const [newUser, setNewUser] = useState({ name: '', email: '', phone: '', password: '' });
   const [showAssigmentsModal, setShowAssigmentsModal] = useState(false);
   const [reservesByUser, setReservesByUser] = useState([]);
-  const [openSnackError, setOpenSnackError] = useState(false);
-  const [openSnackSuccess, setOpenSnackSuccess] = useState(false);
+  const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false);
+  const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false);
   const [snackMessage, setSnackMessage] = useState('');
   const [isPinShowing, setIsPinShowing] = useState(false);
-
-  const handleClick = () => {
-    setOpenSnackError(false);
-    setOpenSnackSuccess(false)
-  };
   const [process, setProcess] = useState(true);
-
-  const Alert = forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-  });
 
   const onOpenDeleteUserModal = (user) => {
     setUserForEditOrDeletion(user);
@@ -77,44 +64,57 @@ function Users() {
     setShowAssigmentsModal(false);
   }
 
+  const onErrorSnackbarOpen = (message) => {
+    setSnackMessage(message);
+    setOpenErrorSnackbar(true);
+  }
+
+  const onErrorSnackbarClose = () => {
+    setOpenErrorSnackbar(false);
+    setSnackMessage('');
+  }
+
+  const onSuccessSnackbarOpen = (message) => {
+    setSnackMessage(message);
+    setOpenSuccessSnackbar(true);
+  }
+
+  const onSuccessSnackbarClose = () => {
+    setOpenSuccessSnackbar(false);
+    setSnackMessage('');
+  }
+
 
   async function createUser(user) {
     try {
       await createNewUser(user);
       setNewUserModalShow(false);
-      setSnackMessage('Usuario creado correctamente.');
-      setOpenSnackSuccess(true);
+      onSuccessSnackbarOpen('Usuario creado correctamente.')
       setUpdateFlag(!updateFlag)
     } catch (error) {
-      console.log(error)
-      setSnackMessage(error.message);
-      setOpenSnackError(true);
+      onErrorSnackbarOpen(error.message);
     }
   }
 
   async function updateUser(userId) {
     try {
       await updateOneUser(userId, userForEditOrDeletion);
-      setEditModalShow(false)
-      setSnackMessage('Usuario modificado correctamente.');
-      setOpenSnackSuccess(true);
-      setUpdateFlag(!updateFlag)
+      setEditModalShow(false);
+      onSuccessSnackbarOpen('Usuario modificado correctamente.');
+      setUpdateFlag(!updateFlag);
     } catch (error) {
-      setSnackMessage(error.message);
-      setOpenSnackError(true);
+      onErrorSnackbarOpen(error.message);
     }
   }
 
   async function deleteUser(userId) {
     try {
       await deleteOneUser(userId);
-      setShowDeleteModal(false)
-      setSnackMessage('Usuario borrado correctamente.');
-      setOpenSnackSuccess(true);
-      setUpdateFlag(!updateFlag)
+      setShowDeleteModal(false);
+      onSuccessSnackbarOpen('Usuario borrado correctamente.');
+      setUpdateFlag(!updateFlag);
     } catch (error) {
-      setSnackMessage(error.message);
-      setOpenSnackError(true);
+      onErrorSnackbarOpen(error.message);
     }
   }
 
@@ -138,8 +138,7 @@ function Users() {
         setReserves(reserves)
         setProcess(false);
       } catch (error) {
-        setSnackMessage(error.message);
-        setOpenSnackError(true);
+        onErrorSnackbarOpen(error.message);
       }
     }
     fetchData();
@@ -398,7 +397,7 @@ function Users() {
           reservations={reservesByUser}
         />
 
-        <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={openSnackError} autoHideDuration={2000} onClose={handleClick}>
+        {/* <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={openSnackError} autoHideDuration={2000} onClose={handleClick}>
           <Alert onClose={handleClick} severity="error" sx={{ width: '100%' }}>
             {snackMessage}
           </Alert>
@@ -407,7 +406,20 @@ function Users() {
           <Alert onClose={handleClick} severity="success" sx={{ width: '100%' }}>
             {snackMessage}
           </Alert>
-        </Snackbar>
+        </Snackbar> */}
+        <Snackbar
+          open={openErrorSnackbar}
+          onClose={onErrorSnackbarClose}
+          message={snackMessage}
+          severity='error'
+        />
+
+        <Snackbar
+          open={openSuccessSnackbar}
+          onClose={onSuccessSnackbarClose}
+          message={snackMessage}
+          severity='success'
+        />
       </div>
 
 
