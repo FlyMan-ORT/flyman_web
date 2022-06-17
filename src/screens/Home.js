@@ -1,22 +1,20 @@
-import { useEffect, useState, forwardRef } from 'react';
+import moment from 'moment';
+import { useEffect, useState } from 'react';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import Modal from 'react-bootstrap/Modal';
-import Form from 'react-bootstrap/Form';
+import LinearProgress from '@mui/material/LinearProgress';
 import ButtonBootstrap from 'react-bootstrap/Button'
+import Badge from 'react-bootstrap/Badge'
 import { getMaintenanceUsers } from '../api/users';
 import { getAllReservations, createReserve } from '../api/reservations';
 import { getAllCars } from '../api/cars';
-import { dateToString } from '../utils/dateParsers';
-import moment from 'moment';
-import Card from 'react-bootstrap/Card'
-import Badge from 'react-bootstrap/Badge'
 import { datesAscending } from '../utils/sorting'
-import { Snackbar } from '@mui/material';
-import MuiAlert from '@mui/material/Alert';
-import LinearProgress from '@mui/material/LinearProgress';
+import MapModal from './Home/components/Modals/MapModal';
+import ReservationsModal from './Home/components/Modals/ReservationsModal';
+import CreateReservationModal from './Home/components/Modals/CreateReservationModal';
+import Snackbar from '../components/Snackbar';
 
 
 const divContainerStyle = {
@@ -28,43 +26,66 @@ const divContainerStyle = {
   paddingRight: 50,
 };
 
-const mapModalStyle = {
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center'
-}
-
 function Home() {
   const [cars, setCars] = useState([]);
   const [reservations, setReservations] = useState([]);
   const [carsWithReservationFirst, setCarsWithReservationFirst] = useState([]);
   const [selectedCarReservations, setSelectedCarReservations] = useState([])
-  const [reservationsModalShow, setReservationsModalShow] = useState(false)
-  const [mapViewModalShow, setMapViewModalShow] = useState(false)
-  const [carForMapView, setCarForMapView] = useState({ position: { latitude: 0, longitude: 0 } })
-  const [sourceForMap, setSourceForMap] = useState('')
-  const [createReserveModalShow, setCreateReserveModalShow] = useState(false)
-  const [maintenanceUsers, setMaintenanceUsers] = useState([])
-  const [reservationSelectedDay, setDiaReserva] = useState(moment().format('YYYY-MM-DD'))
-  const [reservationSelectedTime, setHoraReserva] = useState(moment().startOf('hour').format('hh:mm'))
-  const [reservationSelectedEmployee, setMailDeOperario] = useState("")
-  const [carForReservation, setCarForReservation] = useState({})
-  const [openSnackError, setOpenSnackError] = useState(false);
-  const [openSnackSuccess, setOpenSnackSuccess] = useState(false);
+  const [showReservationsModal, setShowReservationsModal] = useState(false);
+  const [showMapModal, setShowMapModal] = useState(false);
+  const [carPosition, setCarPosition] = useState({ latitude: 0, longitude: 0 });
+  const [showCreateReservationModal, setShowCreateReservationModal] = useState(false);
+  const [maintenanceUsers, setMaintenanceUsers] = useState([]);
+  const [carForReservation, setCarForReservation] = useState({});
+  const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false);
+  const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false);
   const [snackMessage, setSnackMessage] = useState('');
   const [updateFlag, setUpdateFlag] = useState(false);
-  const handleCloseReservationModal = () => setReservationsModalShow(false);
-  const handleCloseMapViewModal = () => setMapViewModalShow(false);
-  const handleCloseCreateReserveModal = () => setCreateReserveModalShow(false);
-  const handleClick = () => {
-    setOpenSnackError(false);
-    setOpenSnackSuccess(false)
-  };
   const [process, setProcess] = useState(true);
 
-  const Alert = forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-  });
+  const onOpenMapModal = (car) => {
+    setCarPosition(car.position);
+    setShowMapModal(true);
+  }
+
+  const onHideMapModal = () => {
+    setShowMapModal(false);
+    setCarPosition({ latitude: 0, longitude: 0 });
+  }
+
+  const onHideReservationsModal = () => {
+    setShowReservationsModal(false);
+  }
+
+  const onOpenCreateReservationsModal = (car) => {
+    setCarForReservation(car);
+    setShowCreateReservationModal(true);
+  }
+
+  const onHideCreateReservationModal = () => {
+    setShowCreateReservationModal(false);
+  }
+
+  const onErrorSnackbarOpen = (message) => {
+    setSnackMessage(error.message);
+    setOpenErrorSnackbar(true);
+  }
+
+  const onErrorSnackbarClose = () => {
+    setOpenErrorSnackbar(false);
+    setSnackMessage('');
+  }
+
+  const onSuccessSnackbarOpen = (message) => {
+    setSnackMessage(message);
+    setOpenSuccessSnackbar(true);
+  }
+
+  const onSuccessSnackbarClose = () => {
+    setOpenSuccessSnackbar(false);
+    setSnackMessage('');
+  }
+
 
   useEffect(() => {
     async function fetchData() {
@@ -79,31 +100,23 @@ function Home() {
         setMaintenanceUsers(valuesMaintananceUser)
         setProcess(false);
       } catch (error) {
-        setSnackMessage(error.message);
-        setOpenSnackError(true);
+        onErrorSnackbarOpen(error.message);
       }
     }
     fetchData();
   }, [updateFlag])
 
-  async function createReservation(car, employeeMail, reservationDay, reservationTime) {
+  async function createReservation(plate, mail, day, time) {
     try {
-      const reservation = { car, employeeMail, reservationDay, reservationTime };
+      const reservation = { plate, mail, day, time };
       await createReserve(reservation);
-      setCreateReserveModalShow(false);
-      setSnackMessage('Reserva creada!');
-      setOpenSnackSuccess(true);
-      setUpdateFlag(!updateFlag)
-      setMailDeOperario("")
+      onSuccessSnackbarOpen('Reserva creada!');
+      setShowCreateReservationModal(false);
+      setUpdateFlag(!updateFlag);
     } catch (error) {
-      setSnackMessage(error.message);
-      setOpenSnackError(true);
+      onErrorSnackbarOpen(error.message);
     }
   };
-
-  useEffect(() => {
-    setSourceForMap('<iframe width = "800" height = "650" style = "border:0" loading = "lazy" allowfullscreen referrerpolicy = "no-referrer-when-downgrade" src = "https://maps.google.com/maps?q=' + carForMapView.position.latitude + ',' + carForMapView.position.longitude + '&hl=es&z=14&amp;output=embed"></iframe >')
-  }, [mapViewModalShow])
 
   useEffect(() => {
     setProcess(true);
@@ -162,7 +175,7 @@ function Home() {
           <ButtonBootstrap variant="outline-secondary" onClick={() => {
             setSelectedCarReservations(reservations.filter(r => r.car.plate === params.row.plate)
               .sort(datesAscending))
-            setReservationsModalShow(true)
+            setShowReservationsModal(true)
           }}>
             Ver <Badge bg="dark">{dayReservations.length}</Badge>
             <span className="visually-hidden"></span>
@@ -191,8 +204,7 @@ function Home() {
       getActions: (params) => [
         <GridActionsCellItem icon={<AssignmentIndIcon fontSize='large' label='Asignar' />}
           onClick={() => {
-            setCarForReservation(cars.find(car => car.plate === params.row.plate))
-            setCreateReserveModalShow(true)
+            onOpenCreateReservationsModal(cars.find(car => car.plate === params.row.plate));
           }
           }
           label="Asignar"
@@ -205,11 +217,7 @@ function Home() {
       type: 'actions',
       getActions: (params) => [
         <GridActionsCellItem icon={<LocationOnIcon fontSize='large' />}
-          onClick={async () => {
-            setCarForMapView(params.row)
-            setMapViewModalShow(true)
-          }
-          }
+          onClick={() => onOpenMapModal(params.row)}
           label="Mapa"
         />
       ]
@@ -292,98 +300,40 @@ function Home() {
           {...reservations}
         />
       </Box>
-      <Modal show={reservationsModalShow} onHide={handleCloseReservationModal} size="m">
-        <Modal.Header closeButton>
-          <Modal.Title>Reservas del dia </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>{selectedCarReservations.map(e => {
-          if (moment().isSame(moment(e.startTime), 'day')) {
-            return (
-              <Card border={(moment(e.startTime).isAfter(moment(), 'hour')) ? "success" : "danger"}
-                style={{ marginBottom: 10 }}>
-                <Card.Header style={{ alignItems: 'center' }}>
-                  <b>{moment(e.startTime).format('hh:mm A')} - {moment(e.endTime).format('hh:mm A')}</b>
-                </Card.Header>
-                <Card.Body>
-                  <Card.Text>{e.user.email}</Card.Text>
-                </Card.Body>
-              </Card>
-            )
-          }
-        })}
-        </Modal.Body>
-      </Modal>
 
-      <Modal show={mapViewModalShow} onHide={handleCloseMapViewModal} size={'xl'}  >
-        <Modal.Header closeButton>
-          <Modal.Title>Vista de mapa</Modal.Title>
-        </Modal.Header>
-        <Modal.Body style={mapModalStyle}>
-          <div dangerouslySetInnerHTML={{ __html: sourceForMap }}></div>
-        </Modal.Body>
+      <ReservationsModal
+        show={showReservationsModal}
+        onHide={onHideReservationsModal}
+        reservations={selectedCarReservations}
+      />
 
-      </Modal>
-      <Modal show={createReserveModalShow} onHide={handleCloseCreateReserveModal}>
-        <Modal.Header >
-          <Modal.Title>Asignar reserva a operario</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <h6>Auto: {carForReservation.plate}</h6>
-          <Form>
-            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-              <Form.Label>Elegir dia</Form.Label>
-              <Form.Control
-                type="date"
-                min={dateToString(new Date())}
-                defaultValue={reservationSelectedDay}
-                onChange={e => { setDiaReserva(e.target.value) }}
-                autoFocus
-              />
-              <Form.Label>Elegir horario</Form.Label>
-              <Form.Control
-                type="time"
-                defaultValue={reservationSelectedTime}
-                onChange={e => { setHoraReserva(e.target.value) }}
-                autoFocus
-              />
-              <Form.Label>Elegir operario</Form.Label>
-              <Form.Select
-                aria-label="Default select example"
-                onChange={e => { setMailDeOperario(e.target.value) }}
-              >
-                <option value="">Seleccionar operario</option>
-                {maintenanceUsers.map((m) => (
-                  <option value={m.value}>{m.label}</option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <ButtonBootstrap variant="secondary" onClick={() => {
-            setCreateReserveModalShow(false)
-            setMailDeOperario("")
-          }
-          }>Cerrar
-          </ButtonBootstrap>
-          <ButtonBootstrap variant="primary" onClick={() => {
-            createReservation(carForReservation, reservationSelectedEmployee, reservationSelectedDay, reservationSelectedTime)
-          }
-          }>Asignar reserva
-          </ButtonBootstrap>
-        </Modal.Footer>
-      </Modal>
-      <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={openSnackError} autoHideDuration={6000} onClose={handleClick}>
-        <Alert onClose={handleClick} severity="error" sx={{ width: '100%' }}>
-          {snackMessage}
-        </Alert>
-      </Snackbar>
-      <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={openSnackSuccess} autoHideDuration={6000} onClose={handleClick}>
-        <Alert onClose={handleClick} severity="success" sx={{ width: '100%' }}>
-          {snackMessage}
-        </Alert>
-      </Snackbar>
-      {/* <SnackBarFlyMan severity={'error'} message={snackMessage} open={openSnackError} handleClick={handleClick} /> */}
+      <MapModal
+        show={showMapModal}
+        onHide={onHideMapModal}
+        position={carPosition}
+      />
+
+      <CreateReservationModal
+        show={showCreateReservationModal}
+        onHide={onHideCreateReservationModal}
+        plate={carForReservation.plate}
+        users={maintenanceUsers}
+        onCreate={(plate, mail, day, time) => createReservation(plate, mail, day, time)}
+      />
+
+      <Snackbar
+        open={openErrorSnackbar}
+        onClose={onErrorSnackbarClose}
+        message={snackMessage}
+        severity='error'
+      />
+
+      <Snackbar
+        open={openSuccessSnackbar}
+        onClose={onSuccessSnackbarClose}
+        message={snackMessage}
+        severity='success'
+      />
     </div>
   );
 }
