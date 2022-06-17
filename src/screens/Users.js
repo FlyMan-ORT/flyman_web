@@ -8,8 +8,6 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import AddIcon from '@mui/icons-material/Add';
-import Modal from 'react-bootstrap/Modal';
-import Form from 'react-bootstrap/Form';
 import ButtonBootstrap from 'react-bootstrap/Button'
 import Badge from 'react-bootstrap/Badge'
 import { datesAscending } from '../utils/sorting'
@@ -18,6 +16,7 @@ import { getAllReservations } from '../api/reservations';
 import DeleteUserModal from './Users/components/modals/DeleteUserModal';
 import AssignmentsModal from './Users/components/modals/AssignmentsModal';
 import CreateUserModal from './Users/components/modals/CreateUserModal';
+import EditUserModal from './Users/components/modals/EditUserModal';
 import Snackbar from '../components/Snackbar';
 
 const divContainerStyle = {
@@ -30,18 +29,18 @@ const divContainerStyle = {
 };
 
 function Users() {
-  const [editModalShow, setEditModalShow] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showNewUserModal, setShowNewUserModal] = useState(false);
   const [users, setUsers] = useState([]);
   const [reserves, setReserves] = useState([]);
-  const [userForEditOrDeletion, setUserForEditOrDeletion] = useState('');
+  const [userForEditOrDeletion, setUserForEditOrDeletion] = useState({});
   const [updateFlag, setUpdateFlag] = useState(false);
   const [showAssigmentsModal, setShowAssigmentsModal] = useState(false);
   const [reservesByUser, setReservesByUser] = useState([]);
+  const [snackMessage, setSnackMessage] = useState('');
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false);
   const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false);
-  const [snackMessage, setSnackMessage] = useState('');
   const [isPinShowing, setIsPinShowing] = useState(false);
   const [process, setProcess] = useState(true);
 
@@ -64,12 +63,22 @@ function Users() {
     setShowAssigmentsModal(false);
   }
 
-  const onOpenNewUserModal = () => {
-    setShowNewUserModal(true);
+  const onOpenCreateUserModal = () => {
+    setShowCreateUserModal(true);
   }
 
-  const onHideNewUserModal = () => {
-    setShowNewUserModal(false);
+  const onHideCreateUserModal = () => {
+    setShowCreateUserModal(false);
+  }
+
+  const onOpenEditUserModal = (user) => {
+    setUserForEditOrDeletion(user);
+    setShowEditModal(true);
+  }
+
+  const onHideEditUserModal = () => {
+    setShowEditModal(false);
+    setUserForEditOrDeletion('');
   }
 
   const onErrorSnackbarOpen = (message) => {
@@ -96,7 +105,7 @@ function Users() {
   async function createUser(user) {
     try {
       await createNewUser(user);
-      onHideNewUserModal();
+      onHideCreateUserModal();
       onSuccessSnackbarOpen('Usuario creado correctamente.')
       setUpdateFlag(!updateFlag)
     } catch (error) {
@@ -104,10 +113,10 @@ function Users() {
     }
   }
 
-  async function updateUser(userId) {
+  async function updateUser(user) {
     try {
-      await updateOneUser(userId, userForEditOrDeletion);
-      setEditModalShow(false);
+      await updateOneUser(user.id, user);
+      setShowEditModal(false);
       onSuccessSnackbarOpen('Usuario modificado correctamente.');
       setUpdateFlag(!updateFlag);
     } catch (error) {
@@ -232,29 +241,31 @@ function Users() {
       width: '90',
 
       getActions: (params) => [
-        <GridActionsCellItem icon={<DeleteIcon />}
+        <GridActionsCellItem
+          icon={<DeleteIcon />}
           onClick={() => { onOpenDeleteUserModal(params.row); }}
-          label="Delete" />,
-        <GridActionsCellItem icon={<EditIcon />}
-          onClick={() => {
-            setUserForEditOrDeletion(params.row)
-            setEditModalShow(true)
-          }
-          }
-          label="Print" />,
+          label="Delete"
+        />,
+        <GridActionsCellItem
+          icon={<EditIcon />}
+          onClick={() => { onOpenEditUserModal(params.row); }}
+          label="Print"
+        />,
       ]
     },
   ];
 
   return (
     <div style={divContainerStyle}>
+
       <ButtonBootstrap
         variant="primary"
         style={{ alignSelf: 'end', marginBottom: 10, backgroundColor: '#1976d2' }}
-        onClick={onOpenNewUserModal}
+        onClick={onOpenCreateUserModal}
       >
         <AddIcon /> Nuevo Usuario
       </ButtonBootstrap>
+
       <DataGrid
         rows={users}
         columns={columns}
@@ -266,72 +277,15 @@ function Users() {
         loading={process}
         {...users}
       />
+
       <div>
-        <Modal show={editModalShow}>
-          <Modal.Header >
-            <Modal.Title>Editar datos</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form>
-              <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-                <Form.Label>Nombre y apellido</Form.Label>
-                <Form.Control
-                  type="text"
-                  defaultValue={userForEditOrDeletion.name}
-                  onChange={e => setUserForEditOrDeletion({ ...userForEditOrDeletion, name: e.target.value })}
-                  autoFocus
-                />
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  type="email"
-                  defaultValue={userForEditOrDeletion.email}
-                  onChange={e => setUserForEditOrDeletion({ ...userForEditOrDeletion, email: e.target.value })}
-                  autoFocus
-                />
-                <Form.Label>Telefono</Form.Label>
-                <Form.Control
-                  type="phone"
-                  defaultValue={userForEditOrDeletion.phone}
-                  onChange={e => setUserForEditOrDeletion({ ...userForEditOrDeletion, phone: e.target.value })}
-                  autoFocus
-                />
-                <Form.Label>Pin</Form.Label>
-                <Form.Control
-                  type="number"
-                  defaultValue={userForEditOrDeletion.pin}
-                  onChange={e => setUserForEditOrDeletion({ ...userForEditOrDeletion, pin: e.target.value })}
-                  autoFocus
-                />
-                <Form.Label>Usuario administrador</Form.Label>
-                <Form.Check
-                  type="switch"
-                  defaultChecked={userForEditOrDeletion.admin}
-                  onChange={e => setUserForEditOrDeletion({ ...userForEditOrDeletion, admin: e.target.checked })}
-                  autoFocus
-                />
-                <Form.Label>Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  onChange={e => setUserForEditOrDeletion({ ...userForEditOrDeletion, password: e.target.value })}
-                  autoFocus
-                />
-              </Form.Group>
-            </Form>
-          </Modal.Body>
-          <Modal.Footer>
-            <ButtonBootstrap variant="secondary" onClick={() => { setEditModalShow(false) }}>
-              Cerrar
-            </ButtonBootstrap>
-            <ButtonBootstrap variant="primary"
-              style={{ backgroundColor: '#1976d2' }}
-              onClick={() => {
-                updateUser(userForEditOrDeletion.id)
-              }
-              }>
-              Guardar cambios
-            </ButtonBootstrap>
-          </Modal.Footer>
-        </Modal>
+
+        <EditUserModal
+          show={showEditModal}
+          onHide={onHideEditUserModal}
+          onEditUser={updateUser}
+          userToEdit={userForEditOrDeletion}
+        />
 
         <DeleteUserModal
           show={showDeleteModal}
@@ -341,8 +295,8 @@ function Users() {
         />
 
         <CreateUserModal
-          show={showNewUserModal}
-          onHide={onHideNewUserModal}
+          show={showCreateUserModal}
+          onHide={onHideCreateUserModal}
           onCreateUser={createUser}
         />
 
@@ -365,9 +319,8 @@ function Users() {
           message={snackMessage}
           severity='success'
         />
+
       </div>
-
-
     </div>
   );
 }
