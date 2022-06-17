@@ -5,7 +5,7 @@ import ButtonBootstrap from 'react-bootstrap/Button'
 import { dateToString } from '../../../../../utils/dateParsers';
 import moment from 'moment';
 
-const ReserveModal = ({ show, onHide, plate, users, onCreate }) => {
+const CreateReservationModal = ({ show, onHide, plate, users, onCreate }) => {
     const [day, setDay] = useState(moment().format('YYYY-MM-DD'));
     const [time, setTime] = useState(moment().startOf('hour').format('hh:mm'));
     const [mail, setMail] = useState("");
@@ -72,4 +72,4 @@ const ReserveModal = ({ show, onHide, plate, users, onCreate }) => {
     )
 }
 
-export default ReserveModal;
+export default CreateReservationModal;
