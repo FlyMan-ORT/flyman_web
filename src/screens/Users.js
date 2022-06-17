@@ -1,5 +1,5 @@
 import moment from 'moment';
-import React, { useEffect, useState, forwardRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -17,6 +17,7 @@ import { getMaintenanceUsers, createNewUser, updateOneUser, deleteOneUser } from
 import { getAllReservations } from '../api/reservations';
 import DeleteUserModal from './Users/components/modals/DeleteUserModal';
 import AssignmentsModal from './Users/components/modals/AssignmentsModal';
+import CreateUserModal from './Users/components/modals/CreateUserModal';
 import Snackbar from '../components/Snackbar';
 
 const divContainerStyle = {
@@ -31,12 +32,11 @@ const divContainerStyle = {
 function Users() {
   const [editModalShow, setEditModalShow] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [newUserModalShow, setNewUserModalShow] = useState(false);
+  const [showNewUserModal, setShowNewUserModal] = useState(false);
   const [users, setUsers] = useState([]);
   const [reserves, setReserves] = useState([]);
   const [userForEditOrDeletion, setUserForEditOrDeletion] = useState('');
   const [updateFlag, setUpdateFlag] = useState(false);
-  const [newUser, setNewUser] = useState({ name: '', email: '', phone: '', password: '' });
   const [showAssigmentsModal, setShowAssigmentsModal] = useState(false);
   const [reservesByUser, setReservesByUser] = useState([]);
   const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false);
@@ -64,6 +64,14 @@ function Users() {
     setShowAssigmentsModal(false);
   }
 
+  const onOpenNewUserModal = () => {
+    setShowNewUserModal(true);
+  }
+
+  const onHideNewUserModal = () => {
+    setShowNewUserModal(false);
+  }
+
   const onErrorSnackbarOpen = (message) => {
     setSnackMessage(message);
     setOpenErrorSnackbar(true);
@@ -88,7 +96,7 @@ function Users() {
   async function createUser(user) {
     try {
       await createNewUser(user);
-      setNewUserModalShow(false);
+      onHideNewUserModal();
       onSuccessSnackbarOpen('Usuario creado correctamente.')
       setUpdateFlag(!updateFlag)
     } catch (error) {
@@ -240,10 +248,12 @@ function Users() {
 
   return (
     <div style={divContainerStyle}>
-      <ButtonBootstrap variant="primary"
+      <ButtonBootstrap
+        variant="primary"
         style={{ alignSelf: 'end', marginBottom: 10, backgroundColor: '#1976d2' }}
-        onClick={() => setNewUserModalShow(true)}
-      ><AddIcon /> Nuevo Usuario
+        onClick={onOpenNewUserModal}
+      >
+        <AddIcon /> Nuevo Usuario
       </ButtonBootstrap>
       <DataGrid
         rows={users}
@@ -330,66 +340,11 @@ function Users() {
           onDelete={(id) => { deleteUser(id) }}
         />
 
-        <Modal show={newUserModalShow}>
-          <Modal.Header >
-            <Modal.Title>Alta de usuario</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form>
-              <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-                <Form.Label>Nombre y apellido</Form.Label>
-                <Form.Control
-                  type="text"
-                  onChange={e => setNewUser({ ...newUser, name: e.target.value })}
-                  autoFocus
-                />
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  type='email'
-                  onChange={e => setNewUser({ ...newUser, email: e.target.value })}
-
-                />
-                <Form.Label>Telefono</Form.Label>
-                <Form.Control
-                  type="phone"
-                  onChange={e => setNewUser({ ...newUser, phone: e.target.value })}
-
-                />
-                <Form.Label>Pin</Form.Label>
-                <Form.Control
-                  type="number"
-                  onChange={e => setNewUser({ ...newUser, pin: e.target.value })}
-
-                />
-                <Form.Label>Usuario administrador</Form.Label>
-                <Form.Check
-                  type="switch"
-                  onChange={e => setNewUser({ ...newUser, admin: e.target.checked })}
-
-                />
-                <Form.Label>Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  onChange={e => setNewUser({ ...newUser, password: e.target.value })}
-
-                />
-              </Form.Group>
-            </Form>
-          </Modal.Body>
-          <Modal.Footer>
-            <ButtonBootstrap variant="secondary" onClick={() => { setNewUserModalShow(false) }}>
-              Cerrar
-            </ButtonBootstrap>
-            <ButtonBootstrap variant="primary"
-              style={{ backgroundColor: '#1976d2' }}
-              onClick={() => {
-                createUser(newUser)
-              }
-              }>
-              Guardar cambios
-            </ButtonBootstrap>
-          </Modal.Footer>
-        </Modal>
+        <CreateUserModal
+          show={showNewUserModal}
+          onHide={onHideNewUserModal}
+          onCreateUser={createUser}
+        />
 
         <AssignmentsModal
           show={showAssigmentsModal}
