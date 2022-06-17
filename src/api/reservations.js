@@ -20,4 +20,14 @@ const createReserve = async (reservation) => {
     }
 }
 
-export { getAllReservations, createReserve }
+const cancelReserve = async (id) => {
+    const url = `${process.env.REACT_APP_BASE_URL}/reservations/${id}`
+    try {
+        const response = await axios.delete(url);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response.data.error);
+    }
+}
+
+export { getAllReservations, createReserve, cancelReserve }
