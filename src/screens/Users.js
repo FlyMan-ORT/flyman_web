@@ -1,17 +1,8 @@
-import React from 'react';
-import { useEffect, useState, forwardRef } from 'react';
+import moment from 'moment';
+import React, { useEffect, useState, forwardRef } from 'react';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import Modal from 'react-bootstrap/Modal';
-import Form from 'react-bootstrap/Form';
-import ButtonBootstrap from 'react-bootstrap/Button'
-import moment from 'moment';
-import Card from 'react-bootstrap/Card'
-import { datesAscending } from '../utils/sorting'
-import Badge from 'react-bootstrap/Badge'
-import { getMaintenanceUsers, createNewUser, updateOneUser, deleteOneUser } from '../api/users';
-import { getAllReservations } from '../api/reservations';
 import { Snackbar } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -20,6 +11,14 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import AddIcon from '@mui/icons-material/Add';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import Modal from 'react-bootstrap/Modal';
+import Form from 'react-bootstrap/Form';
+import ButtonBootstrap from 'react-bootstrap/Button'
+import Card from 'react-bootstrap/Card'
+import Badge from 'react-bootstrap/Badge'
+import { datesAscending } from '../utils/sorting'
+import { getMaintenanceUsers, createNewUser, updateOneUser, deleteOneUser } from '../api/users';
+import { getAllReservations } from '../api/reservations';
 
 
 const divContainerStyle = {
@@ -45,7 +44,7 @@ function Users() {
   const [openSnackError, setOpenSnackError] = useState(false);
   const [openSnackSuccess, setOpenSnackSuccess] = useState(false);
   const [snackMessage, setSnackMessage] = useState('');
-  const [isPinShowing, setIsPinShowing] = useState(false);  
+  const [isPinShowing, setIsPinShowing] = useState(false);
 
   const handleClick = () => {
     setOpenSnackError(false);
@@ -160,18 +159,19 @@ function Users() {
               display: 'flex',
               flexDirection: 'row'
             }}>
-              <p onClick={() => { setIsPinShowing(false) }} style={{paddingRight:10}}>{params.row.pin}</p>
+              <p onClick={() => { setIsPinShowing(false) }} style={{ paddingRight: 10 }}>{params.row.pin}</p>
               <VisibilityOffIcon color="disabled" onClick={() => { setIsPinShowing(false) }}></VisibilityOffIcon>
             </div>)
         }
         return (
           <div style={{
             display: 'flex',
-            flexDirection: 'row'}}>
-            <p style={{paddingRight:20}}>••••</p>
+            flexDirection: 'row'
+          }}>
+            <p style={{ paddingRight: 20 }}>••••</p>
             <VisibilityIcon color="disabled" onClick={() => { setIsPinShowing(true) }} />
           </div>
-          
+
         )
 
       }
