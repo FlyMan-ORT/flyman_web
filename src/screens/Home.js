@@ -8,7 +8,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import ButtonBootstrap from 'react-bootstrap/Button'
 import Badge from 'react-bootstrap/Badge'
 import { getMaintenanceUsers } from '../api/users';
-import { getAllReservations, createReserve, cancelReserve } from '../api/reservations';
+import { getAllReservations, createReserve } from '../api/reservations';
 import { getAllCars } from '../api/cars';
 import { datesAscending } from '../utils/sorting'
 import MapModal from './Home/components/modals/MapModal';
@@ -42,8 +42,6 @@ function Home() {
   const [snackMessage, setSnackMessage] = useState('');
   const [updateFlag, setUpdateFlag] = useState(false);
   const [process, setProcess] = useState(true);
-  const [cancelReservationModalShow, setCancelReservationModalShow] = useState(false);
-  const [reserveForCancel, setReserveForCancel]= useState({});
 
 
   const onOpenMapModal = (car) => {
@@ -122,19 +120,6 @@ function Home() {
     } catch (error) {
       console.log(error.message);
       onErrorSnackbarOpen(error.message);
-    }
-  };
-
-  async function cancelReservation(id) {
-    try {
-      await cancelReserve(id);
-      setCancelReservationModalShow(false);
-      setSnackMessage('Reserva cancelada exitosamente');
-      setOpenSnackSuccess(true);
-      setUpdateFlag(!updateFlag)
-    } catch (error) {
-      setSnackMessage(error.message);
-      setOpenSnackError(true);
     }
   };
 
@@ -275,23 +260,7 @@ function Home() {
     { field: 'description', headerName: 'Modelo', width: 130 },
     { field: 'fuelType', headerName: 'Combustible', width: 130 },
     { field: 'parkingName', headerName: 'Estacionamiento', width: 180 },
-    { field: 'idParkingSlot', headerName: 'Ubicacion', width: 80 },
-    {
-      headerName: 'Gestion',
-      field: 'actions',
-      type: 'actions',
-      width: '90',
-
-      getActions: (params) => [
-        <GridActionsCellItem icon={<DeleteIcon />}
-          onClick={() => {
-            setReserveForCancel(params.row)
-            setCancelReservationModalShow(true)
-          }
-          }
-          label="Delete" />,
-      ]
-    },
+    { field: 'idParkingSlot', headerName: 'Ubicacion', width: 80 }
   ]
 
 
@@ -354,7 +323,7 @@ function Home() {
         onHide={onHideCreateReservationModal}
         plate={carForReservation.plate}
         users={maintenanceUsers}
-        onCreate={(plate, mail, day, time) => createReservation(plate, mail, day, time)}
+        onCreate={createReservation}
       />
 
       <Snackbar

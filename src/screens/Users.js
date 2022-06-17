@@ -18,6 +18,7 @@ import Badge from 'react-bootstrap/Badge'
 import { datesAscending } from '../utils/sorting'
 import { getMaintenanceUsers, createNewUser, updateOneUser, deleteOneUser } from '../api/users';
 import { getAllReservations } from '../api/reservations';
+import DeleteUserModal from './Users/components/modals/DeleteUserModal';
 
 
 
@@ -32,11 +33,11 @@ const divContainerStyle = {
 
 function Users() {
   const [editModalShow, setEditModalShow] = useState(false);
-  const [deleteModalShow, setDeleteModalShow] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [newUserModalShow, setNewUserModalShow] = useState(false);
   const [users, setUsers] = useState([]);
   const [reserves, setReserves] = useState([]);
-  const [userForEditOrDeletion, setUserForEditOrDeletion] = useState('');
+  const [userForEditOrDeletion, setUserForEditOrDeletion] = useState({});
   const [updateFlag, setUpdateFlag] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', phone: '', password: '' });
   const [assigmentsModalShow, setAssigmentsModalShow] = useState(false);
@@ -55,6 +56,16 @@ function Users() {
   const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
+
+  const onOpenDeleteUserModal = (user) => {
+    setUserForEditOrDeletion(user);
+    setEditModalShow(true);
+  }
+
+  const onHideDeleteUserModal = () => {
+    setEditModalShow(false);
+    setUserForEditOrDeletion({});
+  }
 
   async function createUser(user) {
     try {
@@ -86,7 +97,7 @@ function Users() {
   async function deleteUser(userId) {
     try {
       await deleteOneUser(userId);
-      setDeleteModalShow(false)
+      setShowDeleteModal(false)
       setSnackMessage('Usuario borrado correctamente.');
       setOpenSnackSuccess(true);
       setUpdateFlag(!updateFlag)
@@ -205,11 +216,7 @@ function Users() {
 
       getActions: (params) => [
         <GridActionsCellItem icon={<DeleteIcon />}
-          onClick={() => {
-            setUserForEditOrDeletion(params.row)
-            setDeleteModalShow(true)
-          }
-          }
+          onClick={() => { onOpenDeleteUserModal(params.row); }}
           label="Delete" />,
         <GridActionsCellItem icon={<EditIcon />}
           onClick={() => {
@@ -307,23 +314,12 @@ function Users() {
           </Modal.Footer>
         </Modal>
 
-        <Modal show={deleteModalShow} onHide={() => setDeleteModalShow(false)} animation={true}>
-          <Modal.Header closeButton>
-            <Modal.Title>Eliminar usuario</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>¿Está seguro de querer borrar al usuario {userForEditOrDeletion.name}?</Modal.Body>
-          <Modal.Footer>
-            <ButtonBootstrap variant="secondary" onClick={() => setDeleteModalShow(false)}>
-              Cancelar
-            </ButtonBootstrap>
-            <ButtonBootstrap variant="danger" onClick={() => {
-              deleteUser(userForEditOrDeletion.id)
-            }
-            }>
-              Confirmar
-            </ButtonBootstrap>
-          </Modal.Footer>
-        </Modal>
+        <DeleteUserModal
+          show={showDeleteModal}
+          name={userForEditOrDeletion.name}
+          onHide={onHideDeleteUserModal}
+          onDelete={deleteUser}
+        />
 
         <Modal show={newUserModalShow}>
           <Modal.Header >
@@ -385,6 +381,7 @@ function Users() {
             </ButtonBootstrap>
           </Modal.Footer>
         </Modal>
+
         <Modal show={assigmentsModalShow} onHide={() => {
           setAssigmentsModalShow(false)
         }} size="sm">
@@ -408,6 +405,7 @@ function Users() {
 
           </Modal.Body>
         </Modal>
+
         <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={openSnackError} autoHideDuration={2000} onClose={handleClick}>
           <Alert onClose={handleClick} severity="error" sx={{ width: '100%' }}>
             {snackMessage}
