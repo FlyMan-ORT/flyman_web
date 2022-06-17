@@ -19,6 +19,7 @@ import { datesAscending } from '../utils/sorting'
 import { getMaintenanceUsers, createNewUser, updateOneUser, deleteOneUser } from '../api/users';
 import { getAllReservations } from '../api/reservations';
 import DeleteUserModal from './Users/components/modals/DeleteUserModal';
+import AssignmentsModal from './Users/components/modals/AssignmentsModal';
 
 
 
@@ -37,10 +38,10 @@ function Users() {
   const [newUserModalShow, setNewUserModalShow] = useState(false);
   const [users, setUsers] = useState([]);
   const [reserves, setReserves] = useState([]);
-  const [userForEditOrDeletion, setUserForEditOrDeletion] = useState({});
+  const [userForEditOrDeletion, setUserForEditOrDeletion] = useState('');
   const [updateFlag, setUpdateFlag] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', phone: '', password: '' });
-  const [assigmentsModalShow, setAssigmentsModalShow] = useState(false);
+  const [showAssigmentsModal, setShowAssigmentsModal] = useState(false);
   const [reservesByUser, setReservesByUser] = useState([]);
   const [openSnackError, setOpenSnackError] = useState(false);
   const [openSnackSuccess, setOpenSnackSuccess] = useState(false);
@@ -59,13 +60,23 @@ function Users() {
 
   const onOpenDeleteUserModal = (user) => {
     setUserForEditOrDeletion(user);
-    setEditModalShow(true);
+    setShowDeleteModal(true);
   }
 
   const onHideDeleteUserModal = () => {
-    setEditModalShow(false);
-    setUserForEditOrDeletion({});
+    setShowDeleteModal(false);
+    setUserForEditOrDeletion('');
   }
+
+  const onOpenAssignmentsModal = (reserves) => {
+    setReservesByUser(reserves);
+    setShowAssigmentsModal(true);
+  }
+
+  const onHideAssignmentsModal = () => {
+    setShowAssigmentsModal(false);
+  }
+
 
   async function createUser(user) {
     try {
@@ -146,13 +157,12 @@ function Users() {
         const dayAsignations = reserves.filter(r => r.user.email === params.row.email).filter(r => (moment().isSame(moment(r.startTime), 'day')))
         return (
           <ButtonBootstrap variant="outline-secondary" onClick={() => {
-            setUserForEditOrDeletion(params.row);
-            setReservesByUser(reserves.filter((r) =>
+            const filteredRserves = reserves.filter((r) =>
               r.user.email === params.row.email &&
               r.bookingType === 'MAINTENANCE' &&
               moment(r.startTime).isSame(moment(), 'day')
-            ).sort(datesAscending))
-            setAssigmentsModalShow(true);
+            ).sort(datesAscending);
+            onOpenAssignmentsModal(filteredRserves);
           }}>
             Ver <Badge bg="dark">{dayAsignations.length}</Badge>
             <span className="visually-hidden"></span>
@@ -316,9 +326,9 @@ function Users() {
 
         <DeleteUserModal
           show={showDeleteModal}
-          name={userForEditOrDeletion.name}
+          user={userForEditOrDeletion}
           onHide={onHideDeleteUserModal}
-          onDelete={deleteUser}
+          onDelete={(id) => { deleteUser(id) }}
         />
 
         <Modal show={newUserModalShow}>
@@ -382,29 +392,11 @@ function Users() {
           </Modal.Footer>
         </Modal>
 
-        <Modal show={assigmentsModalShow} onHide={() => {
-          setAssigmentsModalShow(false)
-        }} size="sm">
-          <Modal.Header closeButton>
-            <Modal.Title>Asignaciones</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>{reservesByUser.map((r) => {
-            return (
-              <Card border={(moment(r.startTime).isAfter(moment(), 'hour')) ? "success" : "danger"} style={{ marginBottom: 10 }}>
-                <Card.Header style={{ alignItems: 'center' }}>
-                  <b>{moment(r.startTime).format('hh:mm A')} : {moment(r.endTime).format('hh:mm A')}</b>
-                </Card.Header>
-                <Card.Body>
-                  <Card.Text>Patente: {r.car.plate}</Card.Text>
-                  <Card.Text>Parking: {r.car.parkingName} </Card.Text>
-                  <Card.Text>Ubicacion: {r.car.idParkingSlot} </Card.Text>
-                </Card.Body>
-              </Card>
-            )
-          })}
-
-          </Modal.Body>
-        </Modal>
+        <AssignmentsModal
+          show={showAssigmentsModal}
+          onHide={onHideAssignmentsModal}
+          reservations={reservesByUser}
+        />
 
         <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={openSnackError} autoHideDuration={2000} onClose={handleClick}>
           <Alert onClose={handleClick} severity="error" sx={{ width: '100%' }}>
