@@ -1,20 +1,13 @@
+import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
-import Modal from 'react-bootstrap/Modal';
-import { getAllServices } from '../api/services';
 import LinearProgress from '@mui/material/LinearProgress';
-import moment from 'moment';
-
 import AssignmentIcon from '@mui/icons-material/Assignment';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import StarRateIcon from '@mui/icons-material/StarRate';
-import ReportIcon from '@mui/icons-material/Report';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import Card from 'react-bootstrap/Card'
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import BuildCircleIcon from '@mui/icons-material/BuildCircle';
-
+import { getAllServices } from '../api/services';
+import NoDataModal from './Historic/components/modals/NoDataModal';
+import DetailsModal from './Historic/components/modals/DetailsModal';
 
 const divContainerStyle = {
   height: 800,
@@ -26,14 +19,29 @@ const divContainerStyle = {
 };
 
 function Historic() {
-
   const [services, setServices] = useState([]);
   const [detailsModalShow, setDetailsModalShow] = useState(false)
-  const [noDataModalShow, setNoDataModalShow] = useState(false);
-  const [serviceDetails, setServiceDetails] = useState([]);
-  const handleClose = () => setDetailsModalShow(false);
-  const [process, setProcess] = useState(true);
+  const [showNoDataModal, setShowNoDataModal] = useState(false);
+  const [serviceDetails, setServiceDetails] = useState({});
+  const [loading, setLoading] = useState(true);
 
+  const onOpenNoDataModal = () => {
+    setShowNoDataModal(true);
+  }
+
+  const onHideNoDataModal = () => {
+    setShowNoDataModal(false);
+  }
+
+  const onOpenDetailsModal = (service) => {
+    setServiceDetails(service);
+    setDetailsModalShow(true);
+  }
+
+  const onHideDetailsModal = () => {
+    setDetailsModalShow(false);
+    setServiceDetails({});
+  }
 
   const columns = [
     {
@@ -45,10 +53,9 @@ function Historic() {
       getActions: (params) => [
         <GridActionsCellItem icon={<AssignmentIcon />} onClick={() => {
           if (params.row.hasOwnProperty('cleanTask')) {
-            setServiceDetails(params.row)
-            setDetailsModalShow(true)
+            onOpenDetailsModal(params.row);
           } else {
-            setNoDataModalShow(true)
+            onOpenNoDataModal();
           }
         }
         }
@@ -93,13 +100,12 @@ function Historic() {
     { field: 'plate', headerName: 'Patente', width: 100 },
     { field: 'startDate', headerName: 'Inicio', width: 170 },
     { field: 'endDate', headerName: 'Fin', width: 170 },
-
   ]
 
   useEffect(() => {
     async function fetchData() {
       try {
-        setProcess(true);
+        setLoading(true);
         const servicesResponse = await getAllServices();
         const servicesForTable = servicesResponse.map((service) => {
           if (!service.hasOwnProperty('tasks')) {
@@ -130,11 +136,10 @@ function Historic() {
             damageDescription: service.damage.damageDescription,
             fuelLoad: service.fuel.fuelLoad,
             fuelPrice: service.fuel.fuelPrice
-
           }
         })
         setServices(servicesForTable);
-        setProcess(false);
+        setLoading(false);
       } catch (error) {
       }
     }
@@ -151,214 +156,21 @@ function Historic() {
         components={{
           LoadingOverlay: LinearProgress,
         }}
-        loading={process}
+        loading={loading}
         {...services}
       />
-      <Modal show={detailsModalShow} onHide={handleClose} size="lg">
-        <Modal.Header closeButton style={{
-          display: 'flex',
-          flexDirection: 'column',
-        }}>
-          <Modal.Title>Detalles del servicio</Modal.Title>
 
-        </Modal.Header>
-        <Modal.Body>
+      <DetailsModal
+        show={detailsModalShow}
+        onHide={onHideDetailsModal}
+        service={serviceDetails}
+      />
 
-          <div style={{
-            alignItems: 'center', display: 'flex',
-            flexDirection: 'column'
-          }}>
-            <img src={serviceDetails.carImage} style={{ height: 150 }}></img>
-            <h7 style={{ marginBottom: 10 }}>{serviceDetails.plate}</h7>
-            <h6 style={{ marginBottom: 30 }}>{serviceDetails.userEmail}</h6>
-            <h6>Limpieza al iniciar servicio</h6>
-            <div style={{
-              alignItems: 'center', display: 'flex',
-              flexDirection: 'row', marginBottom: 30
-            }}>
-              <StarRateIcon color='primary'></StarRateIcon>
-              <StarRateIcon color={serviceDetails.cleanliness > 1 ? 'primary' : 'disabled'}></StarRateIcon>
-              <StarRateIcon color={serviceDetails.cleanliness > 2 ? 'primary' : 'disabled'}></StarRateIcon>
-              <StarRateIcon color={serviceDetails.cleanliness > 3 ? 'primary' : 'disabled'}></StarRateIcon>
-              <StarRateIcon color={serviceDetails.cleanliness > 4 ? 'primary' : 'disabled'}></StarRateIcon>
-            </div>
-          </div>
+      <NoDataModal
+        show={showNoDataModal}
+        onHide={onHideNoDataModal}
+      />
 
-
-          <div style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center'
-          }}>
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '30%'
-            }}>
-              <div style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                paddingRight: 20
-              }}>
-                <h6>Servicio de limpieza</h6>
-                <div style={{ marginLeft: 'auto' }}>
-                  {serviceDetails.cleanTask ? <CheckBoxIcon color='success'></CheckBoxIcon> : <HighlightOffIcon color='error'></HighlightOffIcon>}
-                </div>
-              </div>
-              <div style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                paddingRight: 20
-              }}>
-                <h6>Inflado de neumaticos</h6>
-                <div style={{ marginLeft: 'auto' }}>
-                  {serviceDetails.inflateTireTask ? <CheckBoxIcon color='success'></CheckBoxIcon> : <HighlightOffIcon color='error'></HighlightOffIcon>}
-                </div>
-              </div>
-              <div style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                paddingRight: 20
-              }}>
-                <h6>Reposicion de lamparita</h6>
-                <div style={{ marginLeft: 'auto' }}>
-                  {serviceDetails.lampFixTask ? <CheckBoxIcon color='success'></CheckBoxIcon> : <HighlightOffIcon color='error'></HighlightOffIcon>}
-                </div>
-              </div>
-            </div>
-
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '30%',
-              paddingRight: 10
-            }}>
-              <div style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                paddingRight: 30
-              }}>
-                <h6>Documentos</h6>
-                <div style={{ marginLeft: 'auto' }}>
-                  {serviceDetails.documents ? <CheckBoxIcon color='success'></CheckBoxIcon> : <HighlightOffIcon color='error'></HighlightOffIcon>}
-                </div>
-              </div>
-              <div style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                paddingRight: 30
-              }}>
-                <h6>Rueda de auxilio</h6>
-                <div style={{ marginLeft: 'auto' }}>
-                  {serviceDetails.tires ? <CheckBoxIcon color='success'></CheckBoxIcon> : <HighlightOffIcon color='error'></HighlightOffIcon>}
-                </div>
-              </div>
-              <div style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                paddingRight: 30
-              }}>
-                <h6>Kit de seguridad</h6>
-                <div style={{ marginLeft: 'auto' }}>
-                  {serviceDetails.securityKit ? <CheckBoxIcon color='success'></CheckBoxIcon> : <HighlightOffIcon color='error'></HighlightOffIcon>}
-                </div>
-              </div>
-            </div>
-
-
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '30%',
-              paddingRight: 10
-            }}>
-              {
-                serviceDetails.isDamaged ?
-                  <div style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'flex-start',
-                    paddingRight: 20
-                  }}>
-                    <h6 style={{ color: 'red' }}> DAÑO REPORTADO</h6>
-                    <div style={{ marginLeft: 'auto' }}>
-                      <ReportIcon color='error'></ReportIcon>
-                    </div>
-                  </div>
-                  :
-                  <div style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'flex-start',
-                    paddingRight: 20
-                  }}>
-                    <h6> Sin Reporte de daño</h6>
-                    <div style={{ marginLeft: 'auto' }}>
-                      <CheckCircleIcon color='primary'></CheckCircleIcon>
-                    </div>
-                  </div>
-              }
-              {
-                serviceDetails.damageDescription === "" ?
-                  <p></p>
-                  :
-                  <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'flex-start',
-                    paddingRight: 20
-                  }}>
-                    <Card className="text-center">
-                      <Card.Text>{serviceDetails.damageDescription}
-                      </Card.Text>
-                    </Card>
-                  </div>
-              }
-            </div>
-          </div>
-          {/* div final */}
-
-          <div style={{
-            alignItems: 'center', display: 'flex',
-            flexDirection: 'column', paddingTop: 30
-          }}>
-            {
-              serviceDetails.fuelLoad ?
-                <div style={{
-                  alignItems: 'center', display: 'flex',
-                  flexDirection: 'column'
-                }}>
-
-                  <h6>Se cargó combustible: <MonetizationOnIcon color='success'></MonetizationOnIcon><b>{serviceDetails.fuelPrice}</b></h6>
-                </div>
-                :
-                null
-            }
-
-
-          </div>
-
-
-        </Modal.Body>
-      </Modal>
-
-      <Modal size="sm" show={noDataModalShow} onHide={() => setNoDataModalShow(false)} aria-labelledby="example-modal-sizes-title-sm" style={{ textAlignL: 'center' }}>
-        <Modal.Header closeButton>
-          <Modal.Title id="example-modal-sizes-title-sm">
-            Detalles del servicio
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>El servicio aún no ha finalizado.</p>
-          <p>No pueden mostrarse los detalles.</p>
-        </Modal.Body>
-      </Modal>
     </div >
   );
 }
