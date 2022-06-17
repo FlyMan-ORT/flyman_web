@@ -397,16 +397,6 @@ function Users() {
           reservations={reservesByUser}
         />
 
-        {/* <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={openSnackError} autoHideDuration={2000} onClose={handleClick}>
-          <Alert onClose={handleClick} severity="error" sx={{ width: '100%' }}>
-            {snackMessage}
-          </Alert>
-        </Snackbar>
-        <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={openSnackSuccess} autoHideDuration={2000} onClose={handleClick}>
-          <Alert onClose={handleClick} severity="success" sx={{ width: '100%' }}>
-            {snackMessage}
-          </Alert>
-        </Snackbar> */}
         <Snackbar
           open={openErrorSnackbar}
           onClose={onErrorSnackbarClose}
