@@ -11,9 +11,9 @@ import { getMaintenanceUsers } from '../api/users';
 import { getAllReservations, createReserve } from '../api/reservations';
 import { getAllCars } from '../api/cars';
 import { datesAscending } from '../utils/sorting'
-import MapModal from './Home/components/Modals/MapModal';
-import ReservationsModal from './Home/components/Modals/ReservationsModal';
-import CreateReservationModal from './Home/components/Modals/CreateReservationModal';
+import MapModal from './Home/components/modals/MapModal';
+import ReservationsModal from './Home/components/modals/ReservationsModal';
+import CreateReservationModal from './Home/components/modals/CreateReservationModal';
 import Snackbar from '../components/Snackbar';
 
 
