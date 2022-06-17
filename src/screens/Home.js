@@ -67,7 +67,7 @@ function Home() {
   }
 
   const onErrorSnackbarOpen = (message) => {
-    setSnackMessage(error.message);
+    setSnackMessage(message);
     setOpenErrorSnackbar(true);
   }
 
@@ -114,6 +114,7 @@ function Home() {
       setShowCreateReservationModal(false);
       setUpdateFlag(!updateFlag);
     } catch (error) {
+      console.log(error.message);
       onErrorSnackbarOpen(error.message);
     }
   };
