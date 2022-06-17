@@ -11,9 +11,10 @@ import { getMaintenanceUsers } from '../api/users';
 import { getAllReservations, createReserve, cancelReserve } from '../api/reservations';
 import { getAllCars } from '../api/cars';
 import { datesAscending } from '../utils/sorting'
-import MapModal from './Home/components/modals/MapModal';
-import ReservationsModal from './Home/components/modals/ReservationsModal';
-import CreateReservationModal from './Home/components/modals/CreateReservationModal';
+import MapModal from './Home/components/Modals/MapModal';
+import ReservationsModal from './Home/components/Modals/ReservationsModal';
+import CreateReservationModal from './Home/components/Modals/CreateReservationModal';
+import ConfirmCancelModal from './Home/components/Modals/ConfirmCancelModal';
 import Snackbar from '../components/Snackbar';
 
 
@@ -42,8 +43,8 @@ function Home() {
   const [snackMessage, setSnackMessage] = useState('');
   const [updateFlag, setUpdateFlag] = useState(false);
   const [process, setProcess] = useState(true);
-  const [cancelReservationModalShow, setCancelReservationModalShow] = useState(false);
-  const [reserveForCancel, setReserveForCancel]= useState({});
+  const [showConfirmCancelModal, setShowConfirmCancelModal] = useState(false);
+  const [reserveForCancel, setReserveForCancel] = useState({});
 
 
   const onOpenMapModal = (car) => {
@@ -67,6 +68,15 @@ function Home() {
 
   const onHideCreateReservationModal = () => {
     setShowCreateReservationModal(false);
+  }
+
+  const onOpenConfirmCancelModal = (reservation) => {
+    setReserveForCancel(reservation);
+    setShowConfirmCancelModal(true)
+  }
+
+  const onHideConfirmCancelModal = () => {
+    setShowConfirmCancelModal(false);
   }
 
   const onErrorSnackbarOpen = (message) => {
@@ -96,14 +106,11 @@ function Home() {
         setProcess(true);
         const carsResponse = await getAllCars();
         setCars(carsResponse);
-        console.log(cars)
         const reservantionResponse = await getAllReservations();
         setReservations(reservantionResponse)
-        console.log(reservations)
         const fetchMaintenanceUsers = await getMaintenanceUsers();
         const valuesMaintananceUser = fetchMaintenanceUsers.map((m) => { return { value: m.email, label: m.name } })
         setMaintenanceUsers(valuesMaintananceUser)
-        console.log(maintenanceUsers)
         setProcess(false);
       } catch (error) {
         onErrorSnackbarOpen(error.message);
@@ -128,13 +135,12 @@ function Home() {
   async function cancelReservation(id) {
     try {
       await cancelReserve(id);
-      setCancelReservationModalShow(false);
-      setSnackMessage('Reserva cancelada exitosamente');
-      setOpenSnackSuccess(true);
+      onSuccessSnackbarOpen('Reserva cancelada exitosamente');
+      setShowConfirmCancelModal(false);
+      setShowReservationsModal(false)
       setUpdateFlag(!updateFlag)
     } catch (error) {
-      setSnackMessage(error.message);
-      setOpenSnackError(true);
+      onErrorSnackbarOpen(error.message);
     }
   };
 
@@ -190,11 +196,13 @@ function Home() {
       headerName: 'Reservas',
       field: 'header',
       renderCell: (params) => {
-        const dayReservations = reservations.filter(r => r.car.plate == params.row.plate).filter(r => (moment().isSame(moment(r.startTime), 'day')))
+        const dayReservations = reservations.filter(r => r.car.plate == params.row.plate)
+                                            .filter(r => (moment().isSame(moment(r.startTime), 'day')))
+                                            .filter(r => r.status === "RESERVED" || r.status === "ACTIVE")
         return (
           <ButtonBootstrap variant="outline-secondary" onClick={() => {
             setSelectedCarReservations(reservations.filter(r => r.car.plate === params.row.plate)
-              .sort(datesAscending))
+                                                   .sort(datesAscending))
             setShowReservationsModal(true)
           }}>
             Ver <Badge bg="dark">{dayReservations.length}</Badge>
@@ -209,7 +217,8 @@ function Home() {
       renderCell: (params) => {
         const nextReservation = reservations.filter(r => r.car.plate == params.row.plate)
           .filter(r => moment().isSame(moment(r.startTime), 'day'))
-          .filter(r => moment(r.startTime).isAfter(moment(), 'hour'))
+          .filter(r => moment(r.startTime).isAfter(moment(), 'minute'))
+          .filter(r => r.status === "RESERVED" || r.status === "ACTIVE")
           .sort(datesAscending)
 
         return (
@@ -275,23 +284,22 @@ function Home() {
     { field: 'description', headerName: 'Modelo', width: 130 },
     { field: 'fuelType', headerName: 'Combustible', width: 130 },
     { field: 'parkingName', headerName: 'Estacionamiento', width: 180 },
-    { field: 'idParkingSlot', headerName: 'Ubicacion', width: 80 },
-    {
-      headerName: 'Gestion',
-      field: 'actions',
-      type: 'actions',
-      width: '90',
+    { field: 'idParkingSlot', headerName: 'Ubicacion', width: 80 }
+    // {
+    //   headerName: 'Gestion',
+    //   field: 'actions',
+    //   type: 'actions',
+    //   width: '90',
 
-      getActions: (params) => [
-        <GridActionsCellItem icon={<DeleteIcon />}
-          onClick={() => {
-            setReserveForCancel(params.row)
-            setCancelReservationModalShow(true)
-          }
-          }
-          label="Delete" />,
-      ]
-    },
+    //   getActions: (params) => [
+    //     <GridActionsCellItem icon={<DeleteIcon />}
+    //       onClick={() => {
+    //         setReserveForCancel(params.row)
+    //       }
+    //       }
+    //       label="Delete" />,
+    //   ]
+    // },
   ]
 
 
@@ -341,6 +349,8 @@ function Home() {
         show={showReservationsModal}
         onHide={onHideReservationsModal}
         reservations={selectedCarReservations}
+        onCreate={(reservation) => onOpenConfirmCancelModal(reservation)}
+
       />
 
       <MapModal
@@ -355,6 +365,17 @@ function Home() {
         plate={carForReservation.plate}
         users={maintenanceUsers}
         onCreate={(plate, mail, day, time) => createReservation(plate, mail, day, time)}
+      />
+
+      <ConfirmCancelModal
+        show={showConfirmCancelModal}
+        onHide={onHideConfirmCancelModal}
+        id={reserveForCancel._id}
+        onCreate={(idRes) => {
+          cancelReservation(idRes)
+        }
+        }
+
       />
 
       <Snackbar

@@ -10,6 +10,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import AddIcon from '@mui/icons-material/Add';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import ButtonBootstrap from 'react-bootstrap/Button'
@@ -18,7 +19,6 @@ import Badge from 'react-bootstrap/Badge'
 import { datesAscending } from '../utils/sorting'
 import { getMaintenanceUsers, createNewUser, updateOneUser, deleteOneUser } from '../api/users';
 import { getAllReservations } from '../api/reservations';
-
 
 
 const divContainerStyle = {
@@ -224,10 +224,10 @@ function Users() {
 
   return (
     <div style={divContainerStyle}>
-      <ButtonBootstrap variant="primary"
-        style={{ alignSelf: 'end', marginBottom: 10, backgroundColor: '#1976d2' }}
+      <ButtonBootstrap variant="light"
+        style={{ alignSelf: 'end', marginBottom: 10, color: '#1976d2' }}
         onClick={() => setNewUserModalShow(true)}
-      ><AddIcon /> Nuevo Usuario
+      ><PersonAddIcon/> Nuevo Usuario
       </ButtonBootstrap>
       <DataGrid
         rows={users}

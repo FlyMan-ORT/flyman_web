@@ -8,7 +8,7 @@ const initialState = {
 }
 
 export const postLogin = createAsyncThunk('auth/login', async (params) => {
-  const url = `${process.env.REACT_APP_BASE_URL}/users/weblogin`;
+  const url = `${process.env.REACT_APP_BASE_URL}/users/web/login`;
   const response = await axios.post(url, { email: params.email, password: params.password });
   return response;
 });
