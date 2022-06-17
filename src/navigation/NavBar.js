@@ -4,6 +4,9 @@ import Home from '../screens/Home';
 import Users from '../screens/Users';
 import Historic from '../screens/Historic';
 import Button from '@mui/material/Button';
+import CarCrashIcon from '@mui/icons-material/CarCrash';
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 
 import { Drawer } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -15,6 +18,7 @@ const linkStyle = {
 };
 
 const buttonStyle = {
+    align: 'left',
     marginBottom: 10,
     width: '100%'
 };
@@ -46,18 +50,18 @@ function NavBar() {
                 
                 <div style={navBarDivStyle}>
                     <Link to="/" style={linkStyle}>
-                        <Button variant="contained" style={buttonStyle} onClick={() => setDrawerShow(false)} >
-                            Autos
+                        <Button variant="text" style={buttonStyle} onClick={() => setDrawerShow(false)} >
+                        <CarCrashIcon alignSelf="left"/> Autos
                         </Button>
                     </Link>
                     <Link to="/Users" style={linkStyle}>
-                        <Button variant="contained" style={buttonStyle} onClick={() => setDrawerShow(false)}>
-                            Usuarios
+                        <Button variant="text" style={buttonStyle} onClick={() => setDrawerShow(false)}>
+                          <PeopleAltIcon/>  Usuarios
                         </Button>
                     </Link>
                     <Link to="/Historic" style={linkStyle}>
-                        <Button variant="contained" style={buttonStyle} onClick={() => setDrawerShow(false)}>
-                            Historial
+                        <Button variant="text" style={buttonStyle} onClick={() => setDrawerShow(false)}>
+                        <ManageSearchIcon/>    Historial 
                         </Button>
                     </Link>
                 </div>
