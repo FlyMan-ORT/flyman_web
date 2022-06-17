@@ -2,7 +2,7 @@ import moment from 'moment';
 import React from 'react'
 import { Card, Modal } from 'react-bootstrap'
 
-const ReservationsModal = ({ show, onHide, reservations }) => {
+const CreateReservationModal = ({ show, onHide, reservations }) => {
     return (
         <Modal show={show} onHide={onHide} size="m">
             <Modal.Header closeButton>
@@ -28,4 +28,4 @@ const ReservationsModal = ({ show, onHide, reservations }) => {
     )
 }
 
-export default ReservationsModal;
+export default CreateReservationModal;

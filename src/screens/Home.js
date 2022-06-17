@@ -3,13 +3,10 @@ import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import Modal from 'react-bootstrap/Modal';
-import Form from 'react-bootstrap/Form';
 import ButtonBootstrap from 'react-bootstrap/Button'
 import { getMaintenanceUsers } from '../api/users';
 import { getAllReservations, createReserve } from '../api/reservations';
 import { getAllCars } from '../api/cars';
-import { dateToString } from '../utils/dateParsers';
 import moment from 'moment';
 import Badge from 'react-bootstrap/Badge'
 import { datesAscending } from '../utils/sorting'
@@ -18,6 +15,7 @@ import MuiAlert from '@mui/material/Alert';
 import LinearProgress from '@mui/material/LinearProgress';
 import MapModal from './Home/components/Modals/MapModal';
 import ReservationsModal from './Home/components/Modals/ReservationsModal';
+import CreateReservationModal from './Home/components/Modals/CreateReservationModal';
 
 
 const divContainerStyle = {
@@ -37,18 +35,14 @@ function Home() {
   const [showReservationsModal, setShowReservationsModal] = useState(false);
   const [showMapModal, setShowMapModal] = useState(false);
   const [carPosition, setCarPosition] = useState({ latitude: 0, longitude: 0 });
-  const [createReserveModalShow, setCreateReserveModalShow] = useState(false);
+  const [showCreateReservationModal, setShowCreateReservationModal] = useState(false);
   const [maintenanceUsers, setMaintenanceUsers] = useState([]);
-  const [reservationSelectedDay, setDiaReserva] = useState(moment().format('YYYY-MM-DD'));
-  const [reservationSelectedTime, setHoraReserva] = useState(moment().startOf('hour').format('hh:mm'));
-  const [reservationSelectedEmployee, setMailDeOperario] = useState("");
   const [carForReservation, setCarForReservation] = useState({});
   const [openSnackError, setOpenSnackError] = useState(false);
   const [openSnackSuccess, setOpenSnackSuccess] = useState(false);
   const [snackMessage, setSnackMessage] = useState('');
   const [updateFlag, setUpdateFlag] = useState(false);
 
-  const handleCloseCreateReserveModal = () => setCreateReserveModalShow(false);
   const handleClick = () => {
     setOpenSnackError(false);
     setOpenSnackSuccess(false)
@@ -71,6 +65,10 @@ function Home() {
 
   const onHideReservationsModal = () => setShowReservationsModal(false);
 
+  const onHideCreateReservationModal = () => {
+    setShowCreateReservationModal(false);
+  }
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -91,15 +89,15 @@ function Home() {
     fetchData();
   }, [updateFlag])
 
-  async function createReservation(car, employeeMail, reservationDay, reservationTime) {
+  async function createReservation(plate, mail, day, time) {
+    console.log(plate, mail, day, time);
     try {
-      const reservation = { car, employeeMail, reservationDay, reservationTime };
+      const reservation = { plate, mail, day, time };
       await createReserve(reservation);
-      setCreateReserveModalShow(false);
+      setShowCreateReservationModal(false);
       setSnackMessage('Reserva creada!');
       setOpenSnackSuccess(true);
       setUpdateFlag(!updateFlag)
-      setMailDeOperario("")
     } catch (error) {
       setSnackMessage(error.message);
       setOpenSnackError(true);
@@ -193,7 +191,7 @@ function Home() {
         <GridActionsCellItem icon={<AssignmentIndIcon fontSize='large' label='Asignar' />}
           onClick={() => {
             setCarForReservation(cars.find(car => car.plate === params.row.plate))
-            setCreateReserveModalShow(true)
+            setShowCreateReservationModal(true)
           }
           }
           label="Asignar"
@@ -290,59 +288,26 @@ function Home() {
         />
       </Box>
 
-      <ReservationsModal show={showReservationsModal} onHide={onHideReservationsModal} reservations={selectedCarReservations} />
-      <MapModal show={showMapModal} onHide={onHideMapModal} position={carPosition} />
+      <ReservationsModal
+        show={showReservationsModal}
+        onHide={onHideReservationsModal}
+        reservations={selectedCarReservations}
+      />
 
-      <Modal show={createReserveModalShow} onHide={handleCloseCreateReserveModal}>
-        <Modal.Header >
-          <Modal.Title>Asignar reserva a operario</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <h6>Auto: {carForReservation.plate}</h6>
-          <Form>
-            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-              <Form.Label>Elegir dia</Form.Label>
-              <Form.Control
-                type="date"
-                min={dateToString(new Date())}
-                defaultValue={reservationSelectedDay}
-                onChange={e => { setDiaReserva(e.target.value) }}
-                autoFocus
-              />
-              <Form.Label>Elegir horario</Form.Label>
-              <Form.Control
-                type="time"
-                defaultValue={reservationSelectedTime}
-                onChange={e => { setHoraReserva(e.target.value) }}
-                autoFocus
-              />
-              <Form.Label>Elegir operario</Form.Label>
-              <Form.Select
-                aria-label="Default select example"
-                onChange={e => { setMailDeOperario(e.target.value) }}
-              >
-                <option value="">Seleccionar operario</option>
-                {maintenanceUsers.map((m) => (
-                  <option value={m.value}>{m.label}</option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <ButtonBootstrap variant="secondary" onClick={() => {
-            setCreateReserveModalShow(false)
-            setMailDeOperario("")
-          }
-          }>Cerrar
-          </ButtonBootstrap>
-          <ButtonBootstrap variant="primary" onClick={() => {
-            createReservation(carForReservation, reservationSelectedEmployee, reservationSelectedDay, reservationSelectedTime)
-          }
-          }>Asignar reserva
-          </ButtonBootstrap>
-        </Modal.Footer>
-      </Modal>
+      <MapModal
+        show={showMapModal}
+        onHide={onHideMapModal}
+        position={carPosition}
+      />
+
+      <CreateReservationModal
+        show={showCreateReservationModal}
+        onHide={onHideCreateReservationModal}
+        plate={carForReservation.plate}
+        users={maintenanceUsers}
+        onCreate={(plate, mail, day, time) => createReservation(plate, mail, day, time)}
+      />
+
       <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={openSnackError} autoHideDuration={6000} onClose={handleClick}>
         <Alert onClose={handleClick} severity="error" sx={{ width: '100%' }}>
           {snackMessage}
