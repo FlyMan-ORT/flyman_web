@@ -1,6 +1,6 @@
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
+import { DataGrid, GridActionsCellItem, GridToolbar } from '@mui/x-data-grid';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -273,6 +273,7 @@ function Users() {
         rowsPerPageOptions={[20]}
         components={{
           LoadingOverlay: LinearProgress,
+          Toolbar: GridToolbar,
         }}
         loading={process}
         {...users}
