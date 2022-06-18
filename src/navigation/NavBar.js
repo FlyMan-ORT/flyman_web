@@ -5,7 +5,7 @@ import Users from '../screens/Users';
 import Historic from '../screens/Historic';
 import Button from '@mui/material/Button';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
-import EngineeringIcon from '@mui/icons-material/Engineering';
+import GroupIcon from '@mui/icons-material/Group';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import { Drawer } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -57,15 +57,18 @@ function NavBar() {
                 <Box sx={{ width: 180, padding: 0 }}>
                     <List>
                         {[
-                            { key:'/',page: '/', text: 'Autos' },
-                            { key:'Users',page: '/Users', text: 'Usuarios' },
-                            { key:'Historic',page: '/Historic', text: 'Historial' },
+                            { key: '/', page: '/', text: 'Autos', icon: 'DirectionsCarIcon' },
+                            { key: 'Users', page: '/Users', text: 'Usuarios' },
+                            { key: 'Historic', page: '/Historic', text: 'Historial' },
                         ].map((menuItem) => (
                             <ListItem key={menuItem.key} style={{ padding: 0 }}>
                                 <Link to={menuItem.page} style={{ textDecoration: 'none', color: '#000' }}>
                                     <ListItemButton onClick={() => setDrawerShow(false)}>
                                         <ListItemIcon>
-                                            <DirectionsCarIcon />
+                                            {menuItem.text === 'Autos' ? <DirectionsCarIcon/> 
+                                                : menuItem.text === 'Usuarios' ? <GroupIcon/> 
+                                                : <ManageSearchIcon/>
+                                            }
                                         </ListItemIcon>
                                         <ListItemText primary={menuItem.text} style={{ width: 120, padding: 8 }} />
                                     </ListItemButton>
