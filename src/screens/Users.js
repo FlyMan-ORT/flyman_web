@@ -7,7 +7,6 @@ import LinearProgress from '@mui/material/LinearProgress';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import AddIcon from '@mui/icons-material/Add';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import ButtonBootstrap from 'react-bootstrap/Button'
 import Badge from 'react-bootstrap/Badge'
@@ -19,6 +18,7 @@ import AssignmentsModal from './Users/components/modals/AssignmentsModal';
 import CreateUserModal from './Users/components/modals/CreateUserModal';
 import EditUserModal from './Users/components/modals/EditUserModal';
 import Snackbar from '../components/Snackbar';
+import { Button } from '@mui/material';
 
 const divContainerStyle = {
   height: 800,
@@ -258,13 +258,13 @@ function Users() {
 
   return (
     <div style={divContainerStyle}>
-       <ButtonBootstrap 
-        variant="light"
-        style={{ alignSelf: 'end', marginBottom: 10, backgroundColor: '#1976d2' }}
+       <Button 
+        variant="text"
+        style={{ alignSelf: 'end', marginBottom: 10 }}
         onClick={onOpenCreateUserModal}
       >
-        <PersonAddIcon /> Nuevo Usuario
-      </ButtonBootstrap>
+        <PersonAddIcon style={{marginRight:5}} /> Nuevo Usuario
+      </Button>
 
       <DataGrid
         rows={users}

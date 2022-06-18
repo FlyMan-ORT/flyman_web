@@ -29,7 +29,7 @@ function TopBar() {
       <div style={loginButtonStyle}>
         {
           (isAuthenticated()) ?
-            <Button variant="text" onClick={() => logoutUser()}> <LogoutIcon/> Cerrar Sesion</Button>
+            <Button variant="text" onClick={() => logoutUser()}> <LogoutIcon style={{marginRight:3}}/> Cerrar Sesion</Button>
             :
             null
         }

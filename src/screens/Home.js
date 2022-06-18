@@ -8,7 +8,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import ButtonBootstrap from 'react-bootstrap/Button'
 import Badge from 'react-bootstrap/Badge'
 import { getMaintenanceUsers } from '../api/users';
-import { getAllReservations, createReserve } from '../api/reservations';
+import { getAllReservations, createReserve, cancelReserve } from '../api/reservations';
 import { getAllCars } from '../api/cars';
 import { datesAscending } from '../utils/sorting'
 import MapModal from './Home/components/Modals/MapModal';
@@ -196,12 +196,12 @@ function Home() {
       field: 'header',
       renderCell: (params) => {
         const dayReservations = reservations.filter(r => r.car.plate == params.row.plate)
-                                            .filter(r => (moment().isSame(moment(r.startTime), 'day')))
-                                            .filter(r => r.status === "RESERVED" || r.status === "ACTIVE")
+          .filter(r => (moment().isSame(moment(r.startTime), 'day')))
+          .filter(r => r.status === "RESERVED" || r.status === "ACTIVE")
         return (
           <ButtonBootstrap variant="outline-secondary" onClick={() => {
             setSelectedCarReservations(reservations.filter(r => r.car.plate === params.row.plate)
-                                                   .sort(datesAscending))
+              .sort(datesAscending))
             setShowReservationsModal(true)
           }}>
             Ver <Badge bg="dark">{dayReservations.length}</Badge>
