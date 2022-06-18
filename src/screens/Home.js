@@ -1,6 +1,6 @@
 import moment from 'moment';
 import { useEffect, useState } from 'react';
-import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
+import { DataGrid, GridActionsCellItem, GridToolbar } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -8,7 +8,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import ButtonBootstrap from 'react-bootstrap/Button'
 import Badge from 'react-bootstrap/Badge'
 import { getMaintenanceUsers } from '../api/users';
-import { getAllReservations, createReserve } from '../api/reservations';
+import { getAllReservations, createReserve, cancelReserve } from '../api/reservations';
 import { getAllCars } from '../api/cars';
 import { datesAscending } from '../utils/sorting'
 import MapModal from './Home/components/Modals/MapModal';
@@ -323,6 +323,7 @@ function Home() {
           rowsPerPageOptions={[20]}
           components={{
             LoadingOverlay: LinearProgress,
+            Toolbar: GridToolbar,
           }}
           loading={process}
           {...reservations}
