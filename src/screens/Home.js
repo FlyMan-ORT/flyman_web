@@ -182,7 +182,6 @@ function Home() {
         position: car.position ? { latitude: car.position.latitude, longitude: car.position.longitude } : { latitude: 0, longitude: 0 },
         battery: car.battery,
         nextReservation: 'nextReservation'
-
       }
     })
     setCarsWithReservationFirst(carsForTable);

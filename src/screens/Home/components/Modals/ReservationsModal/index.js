@@ -1,8 +1,6 @@
 import moment from 'moment';
 import React from 'react';
-import { Card, Modal } from 'react-bootstrap';
-import DeleteIcon from '@mui/icons-material/Delete';
-import Box from '@mui/material/Box';
+import { Badge, Card, Modal } from 'react-bootstrap';
 import ButtonBootstrap from 'react-bootstrap/Button';
 
 const CreateReservationModal = ({ show, onHide, reservations, onCreate }) => {
@@ -12,6 +10,7 @@ const CreateReservationModal = ({ show, onHide, reservations, onCreate }) => {
                 <Modal.Title>Reservas del dia </Modal.Title>
             </Modal.Header>
             <Modal.Body>{reservations.map(reservation => {
+                const bookingTypeColor = reservation.bookingType === 'MAINTENANCE' ? 'warning' : 'primary'
                 if (moment().isSame(moment(reservation.startTime), 'day') && (reservation.status === 'RESERVED' || reservation.status === 'ACTIVE')) {
                     return (
                         <Card
@@ -20,7 +19,20 @@ const CreateReservationModal = ({ show, onHide, reservations, onCreate }) => {
                             style={{ marginBottom: 10 }}
                         >
                             <Card.Header style={{ alignItems: 'center' }}>
-                                <b>{moment(reservation.startTime).format('hh:mm A')} - {moment(reservation.endTime).format('hh:mm A')}</b>
+                            <b>{moment(reservation.startTime).format('hh:mm A')} - {moment(reservation.endTime).format('hh:mm A')}</b>
+                                <div style={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    alignItems: 'flex-start',
+                                }}>                                    
+                                    <Badge pill bg={bookingTypeColor} style={{marginTop:5, marginRight:5}}>
+                                        {reservation.bookingType}
+                                    </Badge>
+                                    <Badge pill bg="secondary" style={{marginTop:5, marginRight:5}}>
+                                        {reservation.status}
+                                    </Badge>                                  
+                                </div>
+
                             </Card.Header>
                             <Card.Body>
                                 <Card.Text>{reservation.user.email}</Card.Text>
