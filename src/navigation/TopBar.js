@@ -18,7 +18,8 @@ const loginButtonStyle = {
 
 function TopBar() {
   const existsToken = useSelector((state) => getSuccessfulLogin(state));
-  const isAuthenticated = () => existsToken !== null;
+  const sessionStorage = window.sessionStorage.getItem('token');
+  const isAuthenticated = () => existsToken || sessionStorage !== null;
   const dispatch = useDispatch();
   const logoutUser = () => {
     dispatch(logout());
@@ -29,7 +30,7 @@ function TopBar() {
       <div style={loginButtonStyle}>
         {
           (isAuthenticated()) ?
-            <Button variant="text" onClick={() => logoutUser()}> <LogoutIcon style={{marginRight:3}}/> Cerrar Sesion</Button>
+            <Button variant="text" onClick={() => logoutUser()}> <LogoutIcon style={{marginRight:3}}/> Cerrar Sesión</Button>
             :
             null
         }
