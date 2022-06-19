@@ -5,7 +5,7 @@ const token = window.sessionStorage.getItem('token');
 const getMaintenanceUsers = async () => {
     const url = `${process.env.REACT_APP_BASE_URL}/users`
     try {
-        const response = await axios.get(url, { headers: { 'Authorization': `Bearer ${token}` } });
+        const response = await axios.get(url, { headers: { 'authorization': `Bearer ${token}` } });
         return response.data;
     } catch (error) {
         throw new Error(error.response.data.error);
@@ -15,7 +15,7 @@ const getMaintenanceUsers = async () => {
 const createNewUser = async (user) => {
     const url = `${process.env.REACT_APP_BASE_URL}/users/register`
     try {
-        const response = await axios.post(url, user, { headers: { 'Authorization': `Bearer ${token}` } });
+        const response = await axios.post(url, user, { headers: { 'authorization': `Bearer ${token}` } });
         return response.data;
     } catch (error) {
         throw new Error(error.response.data.error);
@@ -25,7 +25,7 @@ const createNewUser = async (user) => {
 const updateOneUser = async (userId, user) => {
     const url = `${process.env.REACT_APP_BASE_URL}/users/${userId}`
     try {
-        const response = await axios.patch(url, user, { headers: { 'Authorization': `Bearer ${token}` } });
+        const response = await axios.patch(url, user, { headers: { 'authorization': `Bearer ${token}` } });
         return response.data;
     } catch (error) {
         throw new Error(error.response.data.error);
