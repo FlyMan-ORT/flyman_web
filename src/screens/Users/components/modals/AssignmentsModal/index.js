@@ -1,7 +1,6 @@
 import moment from 'moment';
 import React from 'react'
-import Modal from 'react-bootstrap/Modal';
-import Card from 'react-bootstrap/Card'
+import { Badge,Card,Modal } from 'react-bootstrap';
 
 const AssignmentsModal = ({ show, onHide, reservations }) => {
     return (
@@ -18,6 +17,15 @@ const AssignmentsModal = ({ show, onHide, reservations }) => {
                     >
                         <Card.Header style={{ alignItems: 'center' }}>
                             <b>{moment(reservation.startTime).format('hh:mm A')} : {moment(reservation.endTime).format('hh:mm A')}</b>
+                            <div style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                alignItems: 'flex-start',
+                            }}>
+                                <Badge pill bg="secondary" style={{ marginTop: 5, marginRight: 5 }}>
+                                    {reservation.status}
+                                </Badge>
+                            </div>
                         </Card.Header>
                         <Card.Body>
                             <Card.Text>Patente: {reservation.car.plate}</Card.Text>
