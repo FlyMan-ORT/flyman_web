@@ -181,8 +181,8 @@ function Home() {
         lastModifiedDate: car.lastModifiedDate,
         position: car.position ? { latitude: car.position.latitude, longitude: car.position.longitude } : { latitude: 0, longitude: 0 },
         battery: car.battery,
-        nextReservation: 'nextReservation'
-
+        lastServiceDate: car.lastServiceDate ? moment(car.lastServiceDate).format('DD/MM/yyyy' ) : '-',
+        nextReservation: 'nextReservation'        
       }
     })
     setCarsWithReservationFirst(carsForTable);
@@ -283,7 +283,8 @@ function Home() {
     { field: 'description', headerName: 'Modelo', width: 130 },
     { field: 'fuelType', headerName: 'Combustible', width: 130 },
     { field: 'parkingName', headerName: 'Estacionamiento', width: 180 },
-    { field: 'idParkingSlot', headerName: 'Ubicacion', width: 80 }
+    { field: 'idParkingSlot', headerName: 'Ubicacion', width: 80, align:'center' },
+    { field: 'lastServiceDate', headerName: 'Ultimo Servicio', width: 200}
   ]
 
 
