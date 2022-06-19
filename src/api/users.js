@@ -1,8 +1,7 @@
 import axios from 'axios';
 
-const token = window.sessionStorage.getItem('token');
-
 const getMaintenanceUsers = async () => {
+    const token = window.sessionStorage.getItem('token');
     const url = `${process.env.REACT_APP_BASE_URL}/users`
     try {
         const response = await axios.get(url, { headers: { 'authorization': `Bearer ${token}` } });
@@ -13,6 +12,7 @@ const getMaintenanceUsers = async () => {
 }
 
 const createNewUser = async (user) => {
+    const token = window.sessionStorage.getItem('token');
     const url = `${process.env.REACT_APP_BASE_URL}/users/register`
     try {
         const response = await axios.post(url, user, { headers: { 'authorization': `Bearer ${token}` } });
@@ -23,6 +23,7 @@ const createNewUser = async (user) => {
 }
 
 const updateOneUser = async (userId, user) => {
+    const token = window.sessionStorage.getItem('token');
     const url = `${process.env.REACT_APP_BASE_URL}/users/${userId}`
     try {
         const response = await axios.patch(url, user, { headers: { 'authorization': `Bearer ${token}` } });
@@ -33,6 +34,7 @@ const updateOneUser = async (userId, user) => {
 }
 
 const deleteOneUser = async (userId) => {
+    const token = window.sessionStorage.getItem('token');
     const url = `${process.env.REACT_APP_BASE_URL}/users/${userId}`
     try {
         const response = await axios.delete(url, { headers: { 'Authorization': `Bearer ${token}` } });
