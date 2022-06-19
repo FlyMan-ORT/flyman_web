@@ -204,7 +204,13 @@ function Home() {
               .sort(datesAscending))
             setShowReservationsModal(true)
           }}>
-            Ver <Badge bg="dark">{dayReservations.length}</Badge>
+            Ver 
+            {
+              (dayReservations.filter(r => r.car.plate === params.row.plate).some(r => r.bookingType === "MAINTENANCE")) ?
+                <Badge style={{marginLeft:"5px"}} bg="success"> {dayReservations.length}</Badge>
+                :
+                <Badge style={{marginLeft:"5px"}} bg="dark"> {dayReservations.length}</Badge>
+            }
             <span className="visually-hidden"></span>
           </ButtonBootstrap>
         )
