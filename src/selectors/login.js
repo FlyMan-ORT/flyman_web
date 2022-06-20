@@ -11,12 +11,3 @@ export const areInvalidUserCredentials = createSelector(
   (error) => error?.errorMessage === 'Invalid user credentials'
 );
 export const isPostingLogin = createSelector([getLoginState], (state) => state?.pending);
-
-export const getLoginSessionData = createSelector(
-  [getSuccessfulLogin],
-  (data) =>
-    data && {
-      username: data.username,
-      organizationId: data.organizationId,
-    }
-);

@@ -4,13 +4,8 @@ import { useDispatch } from 'react-redux';
 import Button from '@mui/material/Button';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
-import { postLogin } from '../features/login';
-import { isFailedLogin } from '../selectors/login';
-
-const loginButtonStyle = {
-    marginLeft: 'auto',
-    paddingRight: 10
-}
+import { postLogin } from '../../features/login';
+import { isFailedLogin } from '../../selectors/login';
 
 const containerDivStyle = {
     display: 'flex',
@@ -24,16 +19,13 @@ function Login() {
     const dispatch = useDispatch();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [isPasswordVisible, setIsPasswordVisible] = useState(true);
     const failedLogin = useSelector(state => isFailedLogin(state));
-        
+
     const userLogin = async () => {
         if (!email || !password) return;
-        dispatch(postLogin({email, password}));
+        dispatch(postLogin({ email, password }));
     }
-    
-    const onPress = () => setIsPasswordVisible(prev => !prev);
-    
+
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', marginTop: 200 }}>
 
@@ -54,7 +46,7 @@ function Login() {
                                     type="password"
                                     onChange={e => setPassword(e.target.value)}
                                 />
-                                {failedLogin && (<span style={{color: 'red', fontSize: '14px'}}>La contraseña o el usuario es incorrecto</span>)}
+                                {failedLogin && (<span style={{ color: 'red', fontSize: '14px' }}>La contraseña o el usuario es incorrecto</span>)}
                             </Form.Group>
                         </Form>
                         <Button variant="contained" style={{ width: '100%' }} onClick={() => userLogin()

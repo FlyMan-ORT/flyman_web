@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Button from '@mui/material/Button';
 import { logout } from '../features/login';
 import { getSuccessfulLogin } from '../selectors/login';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 const topBarDivStyle = {
   display: 'flex',
@@ -17,7 +18,8 @@ const loginButtonStyle = {
 
 function TopBar() {
   const existsToken = useSelector((state) => getSuccessfulLogin(state));
-  const isAuthenticated = () => existsToken !== null;
+  const sessionStorage = window.sessionStorage.getItem('token');
+  const isAuthenticated = () => existsToken || sessionStorage !== null;
   const dispatch = useDispatch();
   const logoutUser = () => {
     dispatch(logout());
@@ -28,7 +30,7 @@ function TopBar() {
       <div style={loginButtonStyle}>
         {
           (isAuthenticated()) ?
-            <Button variant="contained" onClick={() => logoutUser()}>Logout</Button>
+            <Button variant="text" onClick={() => logoutUser()}> <LogoutIcon style={{marginRight:3}}/> Cerrar Sesión</Button>
             :
             null
         }
