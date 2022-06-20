@@ -24,7 +24,7 @@ const DetailsModal = ({ show, onHide, service }) => {
                     alignItems: 'center', display: 'flex',
                     flexDirection: 'column'
                 }}>
-                    <img src={service.carImage} style={{ height: 150 }}></img>
+                    <img src={service.carImage} style={{ height: 150 }} alt="carImage"/>
                     <h6 style={{ marginBottom: 10 }}>{service.plate}</h6>
                     <h6 style={{ marginBottom: 30 }}>{service.userEmail}</h6>
                     <h6>Limpieza al iniciar servicio</h6>
