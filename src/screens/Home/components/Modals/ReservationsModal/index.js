@@ -2,6 +2,7 @@ import moment from 'moment';
 import React from 'react';
 import { Badge, Card, Modal } from 'react-bootstrap';
 import ButtonBootstrap from 'react-bootstrap/Button';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const CreateReservationModal = ({ show, onHide, reservations, onCreate }) => {
     return (
@@ -42,6 +43,7 @@ const CreateReservationModal = ({ show, onHide, reservations, onCreate }) => {
                                 onCreate(reservation)
                             }}>
                                 Eliminar reserva
+                                <DeleteIcon />
                             </ButtonBootstrap>
                         </Card>
                     )
