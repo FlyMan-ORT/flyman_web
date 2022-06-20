@@ -4,8 +4,8 @@ import { useDispatch } from 'react-redux';
 import Button from '@mui/material/Button';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
-import { postLogin } from '../features/login';
-import { isFailedLogin } from '../selectors/login';
+import { postLogin } from '../../features/login';
+import { isFailedLogin } from '../../selectors/login';
 
 const containerDivStyle = {
     display: 'flex',

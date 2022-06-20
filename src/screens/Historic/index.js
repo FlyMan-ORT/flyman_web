@@ -5,9 +5,9 @@ import LinearProgress from '@mui/material/LinearProgress';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import BuildCircleIcon from '@mui/icons-material/BuildCircle';
-import { getAllServices } from '../api/services';
-import NoDataModal from './Historic/components/modals/NoDataModal';
-import DetailsModal from './Historic/components/modals/DetailsModal';
+import { getAllServices } from '../../api/services';
+import NoDataModal from './components/modals/NoDataModal';
+import DetailsModal from './components/modals/DetailsModal';
 
 const divContainerStyle = {
   height: 800,

@@ -1,6 +1,7 @@
-import React from 'react'
+import React from 'react';
 import Modal from 'react-bootstrap/Modal';
-import ButtonBootstrap from 'react-bootstrap/Button'
+import ButtonBootstrap from 'react-bootstrap/Button';
+
 
 const ConfirmCancelModal = ({ show, onHide, id, onCreate }) => {
     return (

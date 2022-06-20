@@ -7,15 +7,15 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import LinearProgress from '@mui/material/LinearProgress';
 import ButtonBootstrap from 'react-bootstrap/Button'
 import Badge from 'react-bootstrap/Badge'
-import { getMaintenanceUsers } from '../api/users';
-import { getAllReservations, createReserve, cancelReserve } from '../api/reservations';
-import { getAllCars } from '../api/cars';
-import { datesAscending } from '../utils/sorting'
-import MapModal from './Home/components/Modals/MapModal';
-import ReservationsModal from './Home/components/Modals/ReservationsModal';
-import CreateReservationModal from './Home/components/Modals/CreateReservationModal';
-import ConfirmCancelModal from './Home/components/Modals/ConfirmCancelModal';
-import Snackbar from '../components/Snackbar';
+import { getMaintenanceUsers } from '../../api/users';
+import { getAllReservations, createReserve, cancelReserve } from '../../api/reservations';
+import { getAllCars } from '../../api/cars';
+import { datesAscending } from '../../utils/sorting'
+import MapModal from './components/Modals/MapModal';
+import ReservationsModal from './components/Modals/ReservationsModal';
+import CreateReservationModal from './components/Modals/CreateReservationModal';
+import ConfirmCancelModal from './components/Modals/ConfirmCancelModal';
+import Snackbar from '../../components/Snackbar';
 
 
 const divContainerStyle = {
@@ -154,8 +154,8 @@ function Home() {
     //filtro y por la primera reserva (la mas temprana del dia) agrego al auto al array
 
     filteredReservations.forEach((r) => {
-      const car = cars.find(c => r.car.plate == c.plate)
-      if (car !== undefined && !filteredCars.some(c => c.plate == car.plate)) {
+      const car = cars.find(c => r.car.plate === c.plate)
+      if (car !== undefined && !filteredCars.some(c => c.plate === car.plate)) {
         filteredCars.push(car)
       }
     })
@@ -195,7 +195,7 @@ function Home() {
       headerName: 'Reservas',
       field: 'header',
       renderCell: (params) => {
-        const dayReservations = reservations.filter(r => r.car.plate == params.row.plate)
+        const dayReservations = reservations.filter(r => r.car.plate === params.row.plate)
           .filter(r => (moment().isSame(moment(r.startTime), 'day')))
           .filter(r => r.status === "RESERVED" || r.status === "ACTIVE")
         return (
@@ -220,7 +220,7 @@ function Home() {
       headerName: 'Proxima',
       field: 'nextReservation',
       renderCell: (params) => {
-        const nextReservation = reservations.filter(r => r.car.plate == params.row.plate)
+        const nextReservation = reservations.filter(r => r.car.plate === params.row.plate)
           .filter(r => moment().isSame(moment(r.startTime), 'day'))
           .filter(r => moment(r.startTime).isAfter(moment(), 'minute'))
           .filter(r => r.status === "RESERVED" || r.status === "ACTIVE")

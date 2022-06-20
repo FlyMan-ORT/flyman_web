@@ -6,19 +6,20 @@ import EditIcon from '@mui/icons-material/Edit';
 import LinearProgress from '@mui/material/LinearProgress';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import ButtonBootstrap from 'react-bootstrap/Button'
 import Badge from 'react-bootstrap/Badge'
-import { datesAscending } from '../utils/sorting'
-import { getMaintenanceUsers, createNewUser, updateOneUser, deleteOneUser } from '../api/users';
-import { getAllReservations } from '../api/reservations';
-import DeleteUserModal from './Users/components/modals/DeleteUserModal';
-import AssignmentsModal from './Users/components/modals/AssignmentsModal';
-import CreateUserModal from './Users/components/modals/CreateUserModal';
-import EditUserModal from './Users/components/modals/EditUserModal';
-import Snackbar from '../components/Snackbar';
+import { datesAscending } from '../../utils/sorting'
+import { getMaintenanceUsers, createNewUser, updateOneUser, deleteOneUser } from '../../api/users';
+import { getAllReservations } from '../../api/reservations';
+import DeleteUserModal from './components/modals/DeleteUserModal';
+import AssignmentsModal from './components/modals/AssignmentsModal';
+import CreateUserModal from './components/modals/CreateUserModal';
+import EditUserModal from './components/modals/EditUserModal';
+import PinModal from './components/modals/PinModal';
+import Snackbar from '../../components/Snackbar';
 import { Button } from '@mui/material';
+
 
 const divContainerStyle = {
   height: 800,
@@ -42,8 +43,8 @@ function Users() {
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false);
   const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false);
-  const [isPinShowing, setIsPinShowing] = useState(false);
   const [process, setProcess] = useState(true);
+  const [showPinModal, setShowPinModal] = useState(false);
 
   const onOpenDeleteUserModal = (user) => {
     setUserForEditOrDeletion(user);
@@ -102,6 +103,15 @@ function Users() {
     setSnackMessage('');
   }
 
+  const onOpenPinUserModal = (user) => {
+    setUserForEditOrDeletion(user);
+    setShowPinModal(true);
+  }
+
+  const onHidePinUserModal = () => {
+    setShowPinModal(false);
+    setUserForEditOrDeletion('');
+  }
 
   async function createUser(user) {
     try {
@@ -189,30 +199,16 @@ function Users() {
     },
     { field: 'phone', headerName: 'Telefono', width: 150 },
     {
-      field: 'pin', headerName: 'PIN', width: 100,
-      renderCell: (params) => {
-        if (isPinShowing) {
-          return (
-            <div style={{
-              display: 'flex',
-              flexDirection: 'row'
-            }}>
-              <p onClick={() => { setIsPinShowing(false) }} style={{ paddingRight: 10 }}>{params.row.pin}</p>
-              <VisibilityOffIcon color="disabled" onClick={() => { setIsPinShowing(false) }}></VisibilityOffIcon>
-            </div>)
-        }
-        return (
-          <div style={{
-            display: 'flex',
-            flexDirection: 'row'
-          }}>
-            <p style={{ paddingRight: 20 }}>••••</p>
-            <VisibilityIcon color="disabled" onClick={() => { setIsPinShowing(true) }} />
-          </div>
+      field: 'Pin', headerName: 'PIN', type: 'actions', width: 100,
+      getActions: (params) => [
+        <GridActionsCellItem
 
-        )
+          icon={<VisibilityIcon />}
+          onClick={() => { onOpenPinUserModal(params.row); }}
+          label="Pin"
 
-      }
+        />,
+      ]
     },
     {
       field: 'email', headerName: 'Email',
@@ -258,12 +254,12 @@ function Users() {
 
   return (
     <div style={divContainerStyle}>
-       <Button 
+      <Button
         variant="text"
         style={{ alignSelf: 'end', marginBottom: 10 }}
         onClick={onOpenCreateUserModal}
       >
-        <PersonAddIcon style={{marginRight:5}} /> Nuevo Usuario
+        <PersonAddIcon style={{ marginRight: 5 }} /> Nuevo Usuario
       </Button>
 
       <DataGrid
@@ -305,6 +301,12 @@ function Users() {
           show={showAssigmentsModal}
           onHide={onHideAssignmentsModal}
           reservations={reservesByUser}
+        />
+
+        <PinModal
+          show={showPinModal}
+          onHide={onHidePinUserModal}
+          user={userForEditOrDeletion}
         />
 
         <Snackbar

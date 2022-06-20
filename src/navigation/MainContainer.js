@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import NavBar from './NavBar';
 import Login from '../screens/Login';
 import { getSuccessfulLogin } from '../selectors/login';

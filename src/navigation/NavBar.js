@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { BrowserRouter as Router, Link, Routes, Route } from 'react-router-dom';
 import Home from '../screens/Home';
-import Users from '../screens/Users';
+import Users from '../screens/Users/index.js';
 import Historic from '../screens/Historic';
 import Button from '@mui/material/Button';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
@@ -16,28 +16,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListItem from '@mui/material/ListItem';
 import Box from '@mui/material/Box';
-
-const linkStyle = {
-    textDecoration: "none",
-    color: 'white',
-    padding: 5,
-};
-
-const buttonStyle = {
-    align: 'left',
-    marginBottom: 10,
-    width: '100%'
-};
-
-const navBarDivStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    padding: 15,
-
-};
-
-
 
 function NavBar() {
     const [drawerShow, setDrawerShow] = useState(false);
