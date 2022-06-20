@@ -7,8 +7,9 @@ import { getSuccessfulLogin } from '../selectors/login';
 function MainContainer() {
 
   const existsToken = useSelector((state) => getSuccessfulLogin(state));  
+  const sessionStorage = window.sessionStorage.getItem('token');
 
-  const isAuthenticated = () => existsToken !== null;
+  const isAuthenticated = () => existsToken || sessionStorage !== null;
   
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }}>
