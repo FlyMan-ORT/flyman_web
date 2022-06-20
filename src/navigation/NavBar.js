@@ -29,7 +29,7 @@ function NavBar() {
 
             <Drawer open={drawerShow} onClose={() => handleClick()}>
                 <div style={{ backgroundColor: '#e5e5e5', width: '100%', padding: 10 }}>
-                    <img style={{ width: 100 }} src="https://www.mykeego.com/img/KEEGOblanco.png"></img>
+                    <img style={{ width: 100 }} src="https://www.mykeego.com/img/KEEGOblanco.png" alt="logo de myKeego"/>
                 </div>
 
                 <Box sx={{ width: 180, padding: 0 }}>

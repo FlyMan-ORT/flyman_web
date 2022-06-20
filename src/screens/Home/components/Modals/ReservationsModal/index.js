@@ -39,15 +39,18 @@ const CreateReservationModal = ({ show, onHide, reservations, onCreate }) => {
                                 <Card.Text>{reservation.user.email}</Card.Text>
 
                             </Card.Body>
+                            { (reservation.bookingType !== 'ROUNDTRIP')? 
                             <ButtonBootstrap variant="text" color="#ff0000" onClick={() => {
                                 onCreate(reservation)
                             }}>
                                 Eliminar reserva
-                                <DeleteIcon />
-                            </ButtonBootstrap>
+                                <DeleteIcon color='error'/>
+                            </ButtonBootstrap> : null
+                            }
                         </Card>
                     )
                 }
+                return null;
             })}
             </Modal.Body>
         </Modal>
