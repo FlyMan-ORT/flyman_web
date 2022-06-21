@@ -112,8 +112,8 @@ function Historic() {
             return {
               id: service._id,
               reservationId: service.reservationId,
-              startDate: moment(service.startDate).format('DD/MM/YYYY hh:mm [hs]'),
-              endDate: service.endDate ? moment(service.endDate).format('DD/MM/YYYY hh:mm [hs]') : "",
+              startDate: moment(service.startDate).format('DD/MM/YYYY hh:mmA'),
+              endDate: service.endDate ? moment(service.endDate).format('DD/MM/YYYY hh:mmA') : "",
               plate: service.plate,
               userEmail: service.userEmail,
             }
@@ -122,8 +122,8 @@ function Historic() {
             plate: service.plate,
             reservationId: service.reservationId,
             userEmail: service.userEmail,
-            startDate: moment(service.startDate).format('DD/MM/YYYY hh:mm [hs]'),
-            endDate: moment(service.endDate).format('DD/MM/YYYY hh:mm [hs]'),
+            startDate: moment(service.startDate).format('DD/MM/YYYY hh:mmA'),
+            endDate: moment(service.endDate).format('DD/MM/YYYY hh:mmA'),
             cleanliness: service.cleanliness,
             carImage: service.carImage,
             cleanTask: service.tasks[0].cleanTask,
