@@ -264,7 +264,7 @@ function Home() {
     },
     {
       field: 'fuelLevel',
-      headerName: 'Combustible',
+      headerName: 'Combustible %',
       width: 130,
       align: 'center',
       cellClassName: (params) => {
