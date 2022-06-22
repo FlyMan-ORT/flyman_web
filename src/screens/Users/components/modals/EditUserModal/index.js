@@ -55,7 +55,7 @@ const EditUserModal = ({ show, onHide, userToEdit, onEditUser }) => {
                         <Form.Check
                             controlid="editUser.form.admin"
                             type="switch"
-                            defaultChecked={user.admin}
+                            checked={user.admin}
                             onChange={value => setUser({ ...user, admin: value.target.checked })}
                             autoFocus
                         />

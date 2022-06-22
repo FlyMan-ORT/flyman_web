@@ -5,7 +5,7 @@ import ButtonBootstrap from 'react-bootstrap/Button'
 
 const CreateUserModal = ({ show, onHide, onCreateUser }) => {
     const [user, setUser] = useState({ name: '', email: '', phone: '', pin: '', admin: false, password: '' });
-
+    
     return (
         <Modal show={show}>
             <Modal.Header >
@@ -55,7 +55,6 @@ const CreateUserModal = ({ show, onHide, onCreateUser }) => {
                             controlid='createUser.form.password'
                             type="password"
                             onChange={value => setUser({ ...user, password: value.target.value })}
-
                         />
                     </Form.Group>
                 </Form>
@@ -63,14 +62,14 @@ const CreateUserModal = ({ show, onHide, onCreateUser }) => {
             <Modal.Footer>
                 <ButtonBootstrap
                     variant="secondary"
-                    onClick={onHide}
+                    onClick={() => onHide(setUser({ name: '', email: '', phone: '', pin: '', admin: false, password: '' }))}
                 >
                     Cerrar
                 </ButtonBootstrap>
                 <ButtonBootstrap
                     variant="primary"
                     style={{ backgroundColor: '#1976d2' }}
-                    onClick={() => { onCreateUser(user) }}
+                    onClick={() => { onCreateUser(user); onHide(setUser({ name: '', email: '', phone: '', pin: '', admin: false, password: '' }))}}
                 >
                     Guardar cambios
                 </ButtonBootstrap>
