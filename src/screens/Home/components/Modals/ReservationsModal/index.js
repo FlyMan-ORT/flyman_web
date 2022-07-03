@@ -4,7 +4,7 @@ import { Badge, Card, Modal } from 'react-bootstrap';
 import ButtonBootstrap from 'react-bootstrap/Button';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const CreateReservationModal = ({ show, onHide, reservations, onCreate }) => {
+const ReservationsModal = ({ show, onHide, reservations, onCancel }) => {
     return (
         <Modal show={show} onHide={onHide} size="m">
             <Modal.Header closeButton>
@@ -41,7 +41,7 @@ const CreateReservationModal = ({ show, onHide, reservations, onCreate }) => {
                             </Card.Body>
                             { (reservation.bookingType !== 'ROUNDTRIP')? 
                             <ButtonBootstrap variant="text" color="#ff0000" onClick={() => {
-                                onCreate(reservation)
+                                onCancel(reservation)
                             }}>
                                 Eliminar reserva
                                 <DeleteIcon color='error'/>
@@ -57,4 +57,4 @@ const CreateReservationModal = ({ show, onHide, reservations, onCreate }) => {
     )
 }
 
-export default CreateReservationModal;
+export default ReservationsModal;

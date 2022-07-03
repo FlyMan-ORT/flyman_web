@@ -206,7 +206,7 @@ function Home() {
           }}>
             Ver
             {
-              (dayReservations.filter(r => r.car.plate === params.row.plate).some(r => r.bookingType === "MAINTENANCE")) ?
+              (dayReservations.some(r => r.bookingType === "MAINTENANCE")) ?
                 <Badge style={{ marginLeft: "5px" }} bg="success"> {dayReservations.length}</Badge>
                 :
                 <Badge style={{ marginLeft: "5px" }} bg="dark"> {dayReservations.length}</Badge>
@@ -341,7 +341,7 @@ function Home() {
         show={showReservationsModal}
         onHide={onHideReservationsModal}
         reservations={selectedCarReservations}
-        onCreate={(reservation) => onOpenConfirmCancelModal(reservation)}
+        onCancel={(reservation) => onOpenConfirmCancelModal(reservation)}
 
       />
 
@@ -363,7 +363,7 @@ function Home() {
         show={showConfirmCancelModal}
         onHide={onHideConfirmCancelModal}
         id={reserveForCancel._id}
-        onCreate={(idRes) => {
+        onCancel={(idRes) => {
           cancelReservation(idRes)
         }
         }

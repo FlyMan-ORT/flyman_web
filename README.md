@@ -1,70 +1,38 @@
-# Getting Started with Create React App
+# FlyMan - Aplicación Web
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+FlyMan se trata de una solución para la empresa de car sharing MyKeego en su proceso de mantenimiento de los autos, donde se ofrecerá un webadmin para el administrador y jefe de los operarios que realizan las tareas a los vehículos de la empresa. Dicho administrador podrá asignar reservas de mantenimiento a cada uno de los operarios, para quienes además se desarrolló una aplicación móvil. En esta aplicación, los operarios podrán visualizar el total de servicios que deben realizar durante su jornada laboral, su órden y los detalles de cada uno, así como también
+información de los vehículos. Además podrán abrir y cerrar los autos desde la misma app y generar reportes del servicio realizado informando posibles daños.
 
-## Available Scripts
 
-In the project directory, you can run:
+## Prerequisitos
+- [Git](https://git-scm.com/downloads)
+- [Node.js y npm](https://nodejs.org/en/download/)
 
-### `npm start`
+## Instalación paso a paso
+1) Abrir una terminal y ejecutar el comando “git clone” para clonar el repositorio en el
+entorno local: 
+```git clone https://github.com/FlyMan-ORT/flyman_web.git```
+2) En la misma terminal, ingresar mediante el comando “cd” a la carpeta creada al clonar el repositorio. 
+Ejemplo: ```cd C:\Users\desktop\flyMan_web```
+3) En la misma terminal, ejecutar el comando “npm install” para instalar todas las
+dependencias y paquetes necesarios para el correcto funcionamiento: 
+```npm install```
+4) Ingresar a la IDE de desarrollo, abrir el repositorio clonado previamente y en la
+carpeta principal crear un archivo sin nombre con la extensión .env para poner ahí
+dentro las variables de entorno necesarias. Solicitar dichas variables al equipo de
+desarrollo ya que no pueden ser de dominio público.
+.env example:
+```REACT_APP_BASE_URL=```
+5) Finalmente para ejecutar el software, abrir una terminal en la IDE de desarrollo e
+ingresar el comando “npm start” para correr la aplicacion web de manera local en modo desarrollo:
+```npm start```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Dependencias principales
+- [axios](https://github.com/axios/axios#readme) para la solicitud de request a la base de datos.
+- [react-moment](https://github.com/headzoo/react-moment#readme) para el manejo de fechas.
+- [material-ui](https://github.com/mui/material-ui#readme) libreria de componentes.
+- [react-bootstrap](https://react-bootstrap.github.io/) libreria de componentes.
+- [redux-toolkit](https://github.com/reduxjs/redux-toolkit#readme) para el manejo de estados.
+- [react-router](https://github.com/remix-run/react-router#readme) para la navegación.
+- [dotenv-expand](https://github.com/motdotla/dotenv-expand#readme) para utilizar las variables de entorno.

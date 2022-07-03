@@ -3,7 +3,7 @@ import Modal from 'react-bootstrap/Modal';
 import ButtonBootstrap from 'react-bootstrap/Button';
 
 
-const ConfirmCancelModal = ({ show, onHide, id, onCreate }) => {
+const ConfirmCancelModal = ({ show, onHide, id, onCancel }) => {
     return (
         <Modal show={show} onHide={onHide} animation={true}>
         <Modal.Header closeButton>
@@ -17,7 +17,7 @@ const ConfirmCancelModal = ({ show, onHide, id, onCreate }) => {
             Cancelar
           </ButtonBootstrap>
           <ButtonBootstrap variant="danger" onClick={() => {
-                        onCreate(id)
+                        onCancel(id)
                     }}>
             Confirmar
           </ButtonBootstrap>
